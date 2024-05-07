@@ -20,8 +20,40 @@ app.get('/api/info', (req, res) => {
     res.json(info)
 })
 
+// Dit is een test van een simpele route
+app.get('/api/test', (req, res) => {
+    console.log('GET /api/test')
+    const info = {
+        name: 'My Nodejs testtesttest',
+        version: '0.0.1',
+        description: 'This is a simple test'
+    }
+    res.json(test)
+})
+
 // Hier komen alle routes
-app.use(userRoutes)
+// UC-201: Registering as a new user
+app.post('/api/user', (req, res) => {})
+
+// UC-202: Retrieve overview of users
+app.get('/api/users', (req, res) => {
+    // Logic to retrieve list of users
+})
+
+// UC-203: Retrieve user profile
+app.get('/api/user/profile', (req, res) => {
+    // Logic to retrieve user's own profile
+})
+
+// UC-205: Modify user data
+app.put('/api/user/profile', (req, res) => {
+    // Logic to modify user's own data
+})
+
+// UC-206: Delete user
+app.delete('/api/user/profile', (req, res) => {
+    // Logic to delete user's own account
+})
 
 // Route error handler
 app.use((req, res, next) => {

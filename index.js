@@ -3,6 +3,7 @@ const userRoutes = require('./src/routes/user.routes')
 const logger = require('./src/util/logger')
 
 const app = express()
+const database = require('./src/dao/inmem-db.js')
 
 // express.json zorgt dat we de body van een request kunnen lezen
 app.use(express.json())
@@ -23,8 +24,8 @@ app.get('/api/info', (req, res) => {
 // Dit is een test van een simpele route
 app.get('/api/test', (req, res) => {
     console.log('GET /api/test')
-    const info = {
-        name: 'My Nodejs testtesttest',
+    const test = {
+        name: 'My Nodejs test test test',
         version: '0.0.1',
         description: 'This is a simple test'
     }
@@ -33,16 +34,47 @@ app.get('/api/test', (req, res) => {
 
 // Hier komen alle routes
 // UC-201: Registering as a new user
-app.post('/api/user', (req, res) => {})
+app.post('/api/user', (req, res) => {
+    const newUser = req.body
+    console.log('POST /api/user', newUser)
 
-// UC-202: Retrieve overview of users
-app.get('/api/users', (req, res) => {
-    // Logic to retrieve list of users
+    database.add(newUser, (error, addedUser) => {
+        if (error) {
+            console.error('Error adding user:', error)
+            return res.status(500).json({ error: 'Failed to add user' })
+        }
+        console.log('User added successfully:', addedUser)
+        res.status(201).json({ status: 201, result: addedUser })
+    })
 })
 
-// UC-203: Retrieve user profile
-app.get('/api/user/profile', (req, res) => {
-    // Logic to retrieve user's own profile
+// UC-202: Retrieve overview of users
+app.get('/api/user', (req, res) => {
+    console.log('GET /api/user')
+    const user = {
+        name: 'All users',
+        version: '0.0.1',
+        description: 'This is a list of all users'
+    }
+    res.json(user)
+})
+
+// UC-203: Retrieve user profile by id
+app.get('/api/user/:userId', (req, res) => {
+    const userId = req.params.userId
+    let user = database.find((user) => user.id == userId)
+    if (user.length > 0) {
+        console.log(user)
+        res.status(200).json({
+            status: 200,
+            result: user
+        })
+    } else {
+        res.status(404).json({
+            status: 404,
+            message: 'User not found'
+        })
+    }
 })
 
 // UC-205: Modify user data

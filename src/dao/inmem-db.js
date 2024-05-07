@@ -60,9 +60,33 @@ const database = {
             // met het toegevoegde item als argument, of null als er een fout is opgetreden
             callback(null, item)
         }, this._delayTime)
-    }
+    },
 
-    // Voeg zelf de overige database functionaliteit toe
+    // Nieuwe functionaliteit: Update een bestaand item in de database
+    update(id, newData, callback) {
+        setTimeout(() => {
+            if (id < 0 || id >= this._data.length) {
+                callback({ message: `Error: id ${id} does not exist!` }, null)
+            } else {
+                // Vind het item in de array op basis van de id en update de gegevens
+                this._data[id] = { ...this._data[id], ...newData }
+                callback(null, this._data[id])
+            }
+        }, this._delayTime)
+    },
+
+    // Nieuwe functionaliteit: Verwijder een item uit de database op basis van de id
+    remove(id, callback) {
+        setTimeout(() => {
+            if (id < 0 || id >= this._data.length) {
+                callback({ message: `Error: id ${id} does not exist!` }, null)
+            } else {
+                // Verwijder het item uit de array op basis van de id
+                const removedItem = this._data.splice(id, 1)[0]
+                callback(null, removedItem)
+            }
+        }, this._delayTime)
+    }
 }
 
 module.exports = database

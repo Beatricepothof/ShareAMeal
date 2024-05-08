@@ -63,7 +63,7 @@ app.get('/api/user', (req, res) => {
 
 // UC-204: Opvragen van user op basis van ID
 app.get('/api/user/:userId', (req, res) => {
-    const userId = req.params.userId // Extract userId parameter from URL
+    const userId = req.params.userId
     console.log(`GET /api/user/${userId}`)
 
     // Call the 'getById' method of your in-memory database

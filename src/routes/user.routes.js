@@ -33,7 +33,7 @@ const validateUserCreate = (req, res, next) => {
         chai.expect(req.body.email).to.be.a('string')
         chai.expect(req.body.email).to.match(
             /\S+@\S+\.\S+/,
-            'Invalid email format'
+            'Invalid email address'
         )
 
         // Validate password field

@@ -77,23 +77,25 @@ describe('UC201 Registreren als nieuwe user', () => {
     })
 
     // TC-201-3: Invalid password
-    it('TC-201-3 Invalid password', (done) => {
+    it('TC-201-2 Ongeldig e-mailadres', (done) => {
         chai.request(server)
             .post(endpointToTest)
             .send({
                 firstName: 'Voornaam',
                 lastName: 'Achternaam',
-                emailAdress: 'test.mail@server.nl',
-                password: ''
+                emailAdress: 'ongeldig.email',
+                password: '123456'
             })
             .end((err, res) => {
                 res.should.have.status(400)
                 res.body.should.be.a('object')
+                res.body.should.have.property('status').equals(400)
                 res.body.should.have
                     .property('message')
-                    .that.is.a('string')
-                    .contains('Invalid password')
-                res.body.should.not.have.property('data')
+                    .equals('Missing or incorrect email field')
+                res.body.should.have.property('data').that.is.an('object').that
+                    .is.empty
+
                 done()
             })
     })

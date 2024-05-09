@@ -36,6 +36,10 @@ const validateUserCreate = (req, res, next) => {
             'Invalid email format'
         )
 
+        // Validate password field
+        assert(req.body.password, 'Missing or incorrect password field')
+        chai.expect(req.body.password).to.not.be.empty
+
         logger.trace('User successfully validated')
         next()
     } catch (ex) {
@@ -88,11 +92,43 @@ const validateUserRetrieve = (req, res, next) => {
     }
 }
 
+const validateUserUpdate = (req, res, next) => {
+    try {
+        // Validate emailAddress field
+        assert(req.body.emailAddress, 'Missing required field emailAddress')
+        chai.expect(req.body.emailAddress).to.not.be.empty
+        chai.expect(req.body.emailAddress).to.be.a('string')
+        chai.expect(req.body.emailAddress).to.match(
+            /\S+@\S+\.\S+/,
+            'Invalid email format'
+        )
+
+        // Validate phoneNumber field
+        if (req.body.phoneNumber) {
+            chai.expect(req.body.phoneNumber).to.be.a('string')
+            chai.expect(req.body.phoneNumber).to.match(
+                /^\d{9}$/,
+                'Invalid phone number'
+            )
+        }
+
+        logger.trace('User successfully validated for update')
+        next()
+    } catch (ex) {
+        logger.trace('User validation failed for update:', ex.message)
+        next({
+            status: 400,
+            message: ex.message,
+            data: {}
+        })
+    }
+}
+
 // Userroutes
 router.post('/api/user', validateUserCreate, userController.create)
 router.get('/api/user', validateUserRetrieve, userController.getAll)
 router.get('/api/user/:userId', userController.getById)
-router.put('/api/user/:userId', userController.update)
+router.put('/api/user/:userId', validateUserUpdate, userController.update)
 router.delete('/api/user/:userId', validateUserDelete, userController.delete)
 router.get('/api/user/profile', validateToken, userController.getProfile)
 

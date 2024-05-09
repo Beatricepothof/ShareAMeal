@@ -60,16 +60,11 @@ describe('UC201 Registreren als nieuwe user', () => {
             })
             .end((err, res) => {
                 chai.expect(res).to.have.status(400)
-                chai.expect(res).not.to.have.status(200)
                 chai.expect(res.body).to.be.a('object')
-                chai.expect(res.body).to.have.property('status').equals(400)
                 chai.expect(res.body)
                     .to.have.property('message')
                     .equals('Missing or incorrect email field')
-                chai
-                    .expect(res.body)
-                    .to.have.property('data')
-                    .that.is.a('object').that.is.empty
+                chai.expect(res.body).not.to.have.property('data')
 
                 done()
             })

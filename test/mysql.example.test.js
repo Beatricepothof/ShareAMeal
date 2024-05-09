@@ -3,11 +3,13 @@ process.env.LOGLEVEL = 'trace'
 
 const chai = require('chai')
 const chaiHttp = require('chai-http')
-const server = require('../index')
 const assert = require('assert')
 const logger = require('../src/util/logger')
 require('dotenv').config()
 const db = require('../src/dao/mysql-db')
+const jwt = require('jsonwebtoken')
+const jwtSecretKey = require('../src/util/config').secretkey
+const server = require('../index')
 
 chai.should()
 chai.use(chaiHttp)
@@ -75,9 +77,11 @@ describe('Example MySql testcase', () => {
             })
         })
 
-        it('TC-xyz should return valid user', (done) => {
+        it('TC-xyz should return valid user profile', (done) => {
+            const token = jwt.sign({ userId: 1 }, jwtSecretKey)
             chai.request(server)
-                .get('/api/user')
+                .get('/api/user/profile')
+                .set('Authorization', 'Bearer ' + token)
                 .end((err, res) => {
                     assert.ifError(err)
                     res.should.have.status(200)

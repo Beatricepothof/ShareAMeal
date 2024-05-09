@@ -4,6 +4,7 @@ const chai = require('chai')
 chai.should()
 const router = express.Router()
 const userController = require('../controllers/user.controller')
+const validateToken = require('./authentication.routes').validateToken
 const logger = require('../util/logger')
 
 // Tijdelijke functie om niet bestaande routes op te vangen
@@ -17,14 +18,24 @@ const notFound = (req, res, next) => {
 
 // Input validation functions for user routes
 const validateUserCreate = (req, res, next) => {
-    if (!req.body.emailAdress || !req.body.firstName || !req.body.lastName) {
+    try {
+        assert(req.body.firstName, 'Missing or incorrect firstName field')
+        chai.expect(req.body.firstName).to.not.be.empty
+        chai.expect(req.body.firstName).to.be.a('string')
+        chai.expect(req.body.firstName).to.match(
+            /^[a-zA-Z]+$/,
+            'firstName must be a string'
+        )
+        logger.trace('User successfully validated')
+        next()
+    } catch (ex) {
+        logger.trace('User validation failed:', ex.message)
         next({
             status: 400,
-            message: 'Missing email or password',
+            message: ex.message,
             data: {}
         })
     }
-    next()
 }
 
 // Input validation function 2 met gebruik van assert
@@ -81,11 +92,12 @@ const validateUserCreateChaiExpect = (req, res, next) => {
 }
 
 // Userroutes
-router.post('/api/user', validateUserCreateChaiExpect, userController.create)
+router.post('/api/user', validateUserCreate, userController.create)
 router.get('/api/user', userController.getAll)
 router.get('/api/user/:userId', userController.getById)
 router.put('/api/user/:userId', userController.update)
 router.delete('/api/user/:userId', userController.delete)
+router.get('/api/user/profile', validateToken, userController.getProfile)
 
 // Tijdelijke routes om niet bestaande routes op te vangen
 // router.put('/api/user/:userId', notFound)

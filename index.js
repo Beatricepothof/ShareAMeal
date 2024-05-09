@@ -4,6 +4,7 @@ const logger = require('./src/util/logger')
 
 const app = express()
 const database = require('./src/dao/inmem-db.js')
+const authRoutes = require('./src/routes/authentication.routes').routes
 
 // express.json zorgt dat we de body van een request kunnen lezen
 app.use(express.json())

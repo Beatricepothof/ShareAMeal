@@ -86,11 +86,9 @@ describe('Example MySql testcase', () => {
                 .end((err, res) => {
                     assert.ifError(err)
                     res.should.have.status(200)
-                    res.should.be.an('object')
-
                     res.body.should.be
                         .an('object')
-                        .that.has.all.keys('status', 'message', 'result')
+                        .that.has.all.keys('status', 'result', 'message')
                     res.body.status.should.be.a('number')
 
                     const data = res.body.result

@@ -95,7 +95,9 @@ const validateUserRetrieve = (req, res, next) => {
 const validateUserUpdate = (req, res, next) => {
     try {
         // Validate emailAddress field
-        assert(req.body.emailAddress, 'Missing required field emailAddress')
+        if (!req.body.emailAddress) {
+            throw new Error('Missing required field emailAddress')
+        }
         chai.expect(req.body.emailAddress).to.not.be.empty
         chai.expect(req.body.emailAddress).to.be.a('string')
         chai.expect(req.body.emailAddress).to.match(

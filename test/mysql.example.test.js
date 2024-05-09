@@ -4,12 +4,12 @@ process.env.LOGLEVEL = 'trace'
 const chai = require('chai')
 const chaiHttp = require('chai-http')
 const assert = require('assert')
-const logger = require('../src/util/logger')
-require('dotenv').config()
-const db = require('../src/dao/mysql-db')
 const jwt = require('jsonwebtoken')
 const jwtSecretKey = require('../src/util/config').secretkey
+const db = require('../src/dao/mysql-db')
 const server = require('../index')
+const logger = require('../src/util/logger')
+require('dotenv').config()
 
 chai.should()
 chai.use(chaiHttp)
@@ -75,6 +75,37 @@ describe('Example MySql testcase', () => {
                     }
                 )
             })
+        })
+
+        it('TC-xyz should return valid user', (done) => {
+            chai.request(server)
+                .get('/api/user')
+                .end((err, res) => {
+                    assert.ifError(err)
+                    res.should.have.status(200)
+                    res.should.be.an('object')
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.all.keys('status', 'message', 'data')
+                    res.body.status.should.be.a('number')
+
+                    const data = res.body.data
+
+                    data.should.be.an('array').that.has.lengthOf(1)
+                    data[0].should.be.an('object').that.has.all.keys(
+                        'id',
+                        'firstName',
+                        'lastName'
+                        // 'emailAdress',
+                        // 'password',
+                        // 'street',
+                        // 'city'
+                    )
+                    data[0].id.should.be.a('number').that.equals(1)
+                    // Enzovoort!
+                    done()
+                })
         })
 
         it('TC-xyz should return valid user profile', (done) => {

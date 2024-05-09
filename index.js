@@ -1,6 +1,7 @@
 const express = require('express')
 const userRoutes = require('./src/routes/user.routes')
 const logger = require('./src/util/logger')
+const validateUserCreate = require('./src/routes/user.routes.js')
 
 const app = express()
 const database = require('./src/dao/inmem-db.js')
@@ -35,18 +36,16 @@ app.get('/api/test', (req, res) => {
 
 // Hier komen alle routes
 // UC-201: Registreren als nieuwe user
-app.post('/api/user', userRoutes.validateUserCreate, (req, res) => {
-    const newUser = req.body
-    console.log('POST /api/user', newUser)
+const newUser = req.body
+console.log('POST /api/user', newUser)
 
-    database.add(newUser, (error, addedUser) => {
-        if (error) {
-            console.error('Error adding user:', error)
-            return res.status(500).json({ error: 'Failed to add user' })
-        }
-        console.log('User added successfully:', addedUser)
-        res.status(201).json({ status: 201, result: addedUser })
-    })
+database.add(newUser, (error, addedUser) => {
+    if (error) {
+        console.error('Error adding user:', error)
+        return res.status(500).json({ error: 'Failed to add user' })
+    }
+    console.log('User added successfully:', addedUser)
+    res.status(201).json({ status: 201, result: addedUser })
 })
 
 // UC-202: Opvragen van overzicht van users

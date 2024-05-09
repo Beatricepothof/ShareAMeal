@@ -35,111 +35,114 @@ app.get('/api/test', (req, res) => {
 })
 
 // Hier komen alle routes
-// UC-201: Registreren als nieuwe user
-const newUser = req.body
-console.log('POST /api/user', newUser)
+app.use('/api/auth', authRoutes)
 
-database.add(newUser, (error, addedUser) => {
-    if (error) {
-        console.error('Error adding user:', error)
-        return res.status(500).json({ error: 'Failed to add user' })
-    }
-    console.log('User added successfully:', addedUser)
-    res.status(201).json({ status: 201, result: addedUser })
-})
+// Hier komen alle routes
+// // UC-201: Registreren als nieuwe user
+// const newUser = req.body
+// console.log('POST /api/user', newUser)
 
-// UC-202: Opvragen van overzicht van users
-app.get('/api/user', (req, res) => {
-    console.log('GET /api/user')
-    database.getAll((error, allUsers) => {
-        if (error) {
-            console.error('Error getting all users:', error)
-            return res.status(500).json({ error: 'Failed to retrieve users' })
-        }
-        console.log('All users retrieved successfully:', allUsers)
-        res.status(200).json({ status: 200, result: allUsers })
-    })
-})
+// database.add(newUser, (error, addedUser) => {
+//     if (error) {
+//         console.error('Error adding user:', error)
+//         return res.status(500).json({ error: 'Failed to add user' })
+//     }
+//     console.log('User added successfully:', addedUser)
+//     res.status(201).json({ status: 201, result: addedUser })
+// })
 
-// UC-204: Opvragen van user op basis van ID
-app.get('/api/user/:userId', (req, res) => {
-    const userId = req.params.userId
-    console.log(`GET /api/user/${userId}`)
+// // UC-202: Opvragen van overzicht van users
+// app.get('/api/user', (req, res) => {
+//     console.log('GET /api/user')
+//     database.getAll((error, allUsers) => {
+//         if (error) {
+//             console.error('Error getting all users:', error)
+//             return res.status(500).json({ error: 'Failed to retrieve users' })
+//         }
+//         console.log('All users retrieved successfully:', allUsers)
+//         res.status(200).json({ status: 200, result: allUsers })
+//     })
+// })
 
-    // Call the 'getById' method of your in-memory database
-    database.getById(userId, (error, user) => {
-        if (error) {
-            // Handle error
-            console.error(`Error getting user with id ${userId}:`, error)
-            return res.status(500).json({ error: 'Failed to retrieve user' })
-        }
-        if (!user) {
-            // User not found
-            console.log(`User with id ${userId} not found`)
-            return res
-                .status(404)
-                .json({ error: `User with id ${userId} not found` })
-        }
-        // User retrieved successfully
-        console.log(`User with id ${userId} retrieved successfully:`, user)
-        res.status(200).json({ status: 200, result: user })
-    })
-})
+// // UC-204: Opvragen van user op basis van ID
+// app.get('/api/user/:userId', (req, res) => {
+//     const userId = req.params.userId
+//     console.log(`GET /api/user/${userId}`)
 
-// UC-205: Wijzigen van usergegevens
-app.put('/api/user/:userId', (req, res) => {
-    const userId = req.params.userId
-    const newData = req.body
-    console.log(`PUT /api/user/:userId/${userId}`, newData)
+//     // Call the 'getById' method of your in-memory database
+//     database.getById(userId, (error, user) => {
+//         if (error) {
+//             // Handle error
+//             console.error(`Error getting user with id ${userId}:`, error)
+//             return res.status(500).json({ error: 'Failed to retrieve user' })
+//         }
+//         if (!user) {
+//             // User not found
+//             console.log(`User with id ${userId} not found`)
+//             return res
+//                 .status(404)
+//                 .json({ error: `User with id ${userId} not found` })
+//         }
+//         // User retrieved successfully
+//         console.log(`User with id ${userId} retrieved successfully:`, user)
+//         res.status(200).json({ status: 200, result: user })
+//     })
+// })
 
-    database.update(userId, newData, (error, updatedUser) => {
-        if (error) {
-            // Handle error
-            console.error(`Error updating user with id ${userId}:`, error)
-            return res.status(500).json({ error: 'Failed to update user' })
-        }
-        if (!updatedUser) {
-            // User not found
-            console.log(`User with id ${userId} not found`)
-            return res
-                .status(404)
-                .json({ error: `User with id ${userId} not found` })
-        }
-        // User updated successfully
-        console.log(`User with id ${userId} updated successfully:`, updatedUser)
-        res.status(200).json({ status: 200, result: updatedUser })
-    })
-})
+// // UC-205: Wijzigen van usergegevens
+// app.put('/api/user/:userId', (req, res) => {
+//     const userId = req.params.userId
+//     const newData = req.body
+//     console.log(`PUT /api/user/:userId/${userId}`, newData)
 
-// UC-206: Verwijderen van user
-app.delete('/api/user/:userId', (req, res) => {
-    const userIdToDelete = req.params.userId
+//     database.update(userId, newData, (error, updatedUser) => {
+//         if (error) {
+//             // Handle error
+//             console.error(`Error updating user with id ${userId}:`, error)
+//             return res.status(500).json({ error: 'Failed to update user' })
+//         }
+//         if (!updatedUser) {
+//             // User not found
+//             console.log(`User with id ${userId} not found`)
+//             return res
+//                 .status(404)
+//                 .json({ error: `User with id ${userId} not found` })
+//         }
+//         // User updated successfully
+//         console.log(`User with id ${userId} updated successfully:`, updatedUser)
+//         res.status(200).json({ status: 200, result: updatedUser })
+//     })
+// })
 
-    // Call the 'delete' method of your in-memory database
-    database.remove(userIdToDelete, (error, deletedUser) => {
-        if (error) {
-            // Handle error
-            console.error(
-                `Error deleting user with id ${userIdToDelete}:`,
-                error
-            )
-            return res.status(500).json({ error: 'Failed to delete user' })
-        }
-        if (!deletedUser) {
-            // User not found
-            console.log(`User with id ${userIdToDelete} not found`)
-            return res
-                .status(404)
-                .json({ error: `User with id ${userIdToDelete} not found` })
-        }
-        // User deleted successfully
-        console.log(`User with id ${userIdToDelete} deleted successfully`)
-        res.status(200).json({
-            status: 200,
-            message: `User with id ${userIdToDelete} deleted successfully`
-        })
-    })
-})
+// // UC-206: Verwijderen van user
+// app.delete('/api/user/:userId', (req, res) => {
+//     const userIdToDelete = req.params.userId
+
+//     // Call the 'delete' method of your in-memory database
+//     database.remove(userIdToDelete, (error, deletedUser) => {
+//         if (error) {
+//             // Handle error
+//             console.error(
+//                 `Error deleting user with id ${userIdToDelete}:`,
+//                 error
+//             )
+//             return res.status(500).json({ error: 'Failed to delete user' })
+//         }
+//         if (!deletedUser) {
+//             // User not found
+//             console.log(`User with id ${userIdToDelete} not found`)
+//             return res
+//                 .status(404)
+//                 .json({ error: `User with id ${userIdToDelete} not found` })
+//         }
+//         // User deleted successfully
+//         console.log(`User with id ${userIdToDelete} deleted successfully`)
+//         res.status(200).json({
+//             status: 200,
+//             message: `User with id ${userIdToDelete} deleted successfully`
+//         })
+//     })
+// })
 
 // Route error handler
 app.use((req, res, next) => {

@@ -20,7 +20,6 @@ const validateUserCreate = (req, res, next) => {
     try {
         // Validate firstName field
         assert(req.body.firstName, 'Missing or incorrect firstName field')
-        chai.expect(req.body.firstName).to.not.be.empty
         chai.expect(req.body.firstName).to.be.a('string')
         chai.expect(req.body.firstName).to.match(
             /^[a-zA-Z]+$/,
@@ -28,17 +27,21 @@ const validateUserCreate = (req, res, next) => {
         )
 
         // Validate email field
-        assert(req.body.email, 'Missing or incorrect email field')
-        chai.expect(req.body.email).to.not.be.empty
-        chai.expect(req.body.email).to.be.a('string')
-        chai.expect(req.body.email).to.match(
-            /\S+@\S+\.\S+/,
+        assert(req.body.emailAdress, 'Missing or incorrect email field')
+        chai.expect(req.body.emailAdress).to.be.a('string')
+        chai.expect(req.body.emailAdress).to.match(
+            /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,3}$/,
             'Invalid email address'
         )
 
         // Validate password field
         assert(req.body.password, 'Missing or incorrect password field')
-        chai.expect(req.body.password).to.not.be.empty
+        chai.expect(req.body.password).to.be.a('string')
+        chai.expect(req.body.password).to.have.length.at.least(8)
+        chai.expect(req.body.password).to.match(
+            /^(?=.*[A-Z])(?=.*\d).{8,}$/,
+            'Invalid password'
+        )
 
         logger.trace('User successfully validated')
         next()

@@ -84,7 +84,7 @@ describe('UC201 Registreren als nieuwe user', () => {
                 firstName: 'Voornaam',
                 lastName: 'Achternaam',
                 emailAdress: 'test.mail@server.nl',
-                password: ''
+                password: 'short'
             })
             .end((err, res) => {
                 chai.expect(res).to.have.status(400)
@@ -92,7 +92,7 @@ describe('UC201 Registreren als nieuwe user', () => {
                 chai.expect(res.body)
                     .to.have.property('message')
                     .that.is.a('string')
-                    .contains('Missing or incorrect password field')
+                    .contains('Invalid password')
                 chai.expect(res.body).not.to.have.property('data')
 
                 done()

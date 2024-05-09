@@ -87,13 +87,13 @@ describe('UC201 Registreren als nieuwe user', () => {
                 password: ''
             })
             .end((err, res) => {
-                res.should.have.status(400)
-                res.body.should.be.a('object')
-                res.body.should.have
-                    .property('message')
+                chai.expect(res).to.have.status(400)
+                chai.expect(res.body).to.be.a('object')
+                chai.expect(res.body)
+                    .to.have.property('message')
                     .that.is.a('string')
-                    .contains('Ongeldig wachtwoord')
-                res.body.should.not.have.property('data')
+                    .contains('Missing or incorrect password field')
+                chai.expect(res.body).not.to.have.property('data')
 
                 done()
             })
@@ -106,16 +106,17 @@ describe('UC201 Registreren als nieuwe user', () => {
             .send({
                 firstName: 'Marieke',
                 lastName: 'Jansen',
-                emailAdress: 'm@server.nl'
+                emailAdress: 'm@server.nl',
+                password: '123456'
             })
             .end((err, res) => {
-                res.should.have.status(403)
-                res.body.should.be.a('object')
-                res.body.should.have
-                    .property('message')
+                chai.expect(res).to.have.status(403)
+                chai.expect(res.body).to.be.a('object')
+                chai.expect(res.body)
+                    .to.have.property('message')
                     .that.is.a('string')
                     .contains('User already exists')
-                res.body.should.not.have.property('data')
+                chai.expect(res.body).not.to.have.property('data')
 
                 done()
             })

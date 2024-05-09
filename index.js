@@ -1,6 +1,7 @@
 const express = require('express')
 const userRoutes = require('./src/routes/user.routes')
 const logger = require('./src/util/logger')
+const validateUserCreate = require('./src/routes/user.routes.js')
 
 const app = express()
 const database = require('./src/dao/inmem-db.js')
@@ -35,7 +36,7 @@ app.get('/api/test', (req, res) => {
 
 // Hier komen alle routes
 // UC-201: Registreren als nieuwe user
-app.post('/api/user', validateUserCreate, (req, res) => {
+app.post('/api/user', userRoutes.validateUserCreate, (req, res) => {
     const newUser = req.body
     console.log('POST /api/user', newUser)
 

@@ -1,7 +1,6 @@
 const express = require('express')
 const userRoutes = require('./src/routes/user.routes')
 const logger = require('./src/util/logger')
-const validateUserCreate = require('./src/routes/user.routes.js')
 
 const app = express()
 const database = require('./src/dao/inmem-db.js')

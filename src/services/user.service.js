@@ -66,6 +66,58 @@ const userService = {
         })
     },
 
+    getById: (userId, callback) => {
+        logger.info('fetching user by id:', userId)
+        database.getById(userId, (err, user) => {
+            if (err) {
+                logger.info(
+                    'error fetching user: ',
+                    err.message || 'unknown error'
+                )
+                callback(err, null)
+            } else {
+                if (!user) {
+                    const notFoundError = new Error(
+                        `User with id ${userId} not found.`
+                    )
+                    logger.info('user not found:', notFoundError.message)
+                    callback(notFoundError, null)
+                } else {
+                    logger.trace(`User found with id ${userId}:`, user)
+                    callback(null, user)
+                }
+            }
+        })
+    },
+
+    update: (userId, newData, callback) => {
+        logger.info(`Updating user with id ${userId}`, newData)
+        database.update(userId, newData, (err, updatedUser) => {
+            if (err) {
+                logger.info(
+                    'error updating user: ',
+                    err.message || 'unknown error'
+                )
+                callback(err, null)
+            } else {
+                if (!updatedUser) {
+                    const notFoundError = new Error(
+                        `User with id ${userId} not found.`
+                    )
+                    logger.info('user not found:', notFoundError.message)
+                    callback(notFoundError, null)
+                } else {
+                    logger.trace(`User updated with id ${userId}:`, updatedUser)
+                    callback(null, {
+                        status: 200,
+                        message: `User with id ${userId} updated successfully.`,
+                        data: updatedUser
+                    })
+                }
+            }
+        })
+    },
+
     getProfile: (userId, callback) => {
         logger.info('getProfile userId:', userId)
 

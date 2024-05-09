@@ -18,6 +18,7 @@ const notFound = (req, res, next) => {
 
 const validateUserCreate = (req, res, next) => {
     try {
+        // Validate firstName field
         assert(req.body.firstName, 'Missing or incorrect firstName field')
         chai.expect(req.body.firstName).to.not.be.empty
         chai.expect(req.body.firstName).to.be.a('string')
@@ -25,6 +26,16 @@ const validateUserCreate = (req, res, next) => {
             /^[a-zA-Z]+$/,
             'firstName must be a string'
         )
+
+        // Validate email field
+        assert(req.body.email, 'Missing or incorrect email field')
+        chai.expect(req.body.email).to.not.be.empty
+        chai.expect(req.body.email).to.be.a('string')
+        chai.expect(req.body.email).to.match(
+            /\S+@\S+\.\S+/,
+            'Invalid email format'
+        )
+
         logger.trace('User successfully validated')
         next()
     } catch (ex) {

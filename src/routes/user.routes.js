@@ -35,7 +35,10 @@ const validateUserCreate = (req, res, next) => {
         )
 
         // Validate password field
-        assert(req.body.password, 'Missing or incorrect password field')
+        if (!req.body.password || req.body.password.trim() === '') {
+            throw new Error('Missing or incorrect password field')
+        }
+
         chai.expect(req.body.password).to.be.a('string')
         chai.expect(req.body.password).to.have.length.at.least(8)
         chai.expect(req.body.password).to.match(

@@ -10,6 +10,11 @@ tracer.setLevel('warn')
 const endpointToTest = '/api/user'
 
 describe('Use Case 202 - Retrieving overview of users', () => {
+    beforeEach((done) => {
+        console.log('Before each test')
+        done()
+    })
+
     // TC-202-1: Show all users (at least 2)
     it('TC-202-1 Show all users', (done) => {
         chai.request(server)

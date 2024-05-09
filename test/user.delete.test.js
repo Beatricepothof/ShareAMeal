@@ -10,6 +10,11 @@ tracer.setLevel('warn')
 const endpointToTest = '/api/user/:userId'
 
 describe('Use Case 206 - Deleting user', () => {
+    beforeEach((done) => {
+        console.log('Before each test')
+        done()
+    })
+
     // TC-206-1: User does not exist
     it('TC-206-1 User does not exist', (done) => {
         chai.request(server)

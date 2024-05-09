@@ -10,6 +10,12 @@ tracer.setLevel('warn')
 const endpointToTest = '/api/user'
 
 describe('UC-201 Register as new user', () => {
+    //
+    beforeEach((done) => {
+        console.log('Before each test')
+        done()
+    })
+
     // TC-201-1: Missing required field
     it('TC-201-1 Missing required field', (done) => {
         chai.request(server)

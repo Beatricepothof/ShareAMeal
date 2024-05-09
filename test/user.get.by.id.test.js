@@ -10,6 +10,11 @@ tracer.setLevel('warn')
 const endpointToTest = '/api/user/:userId'
 
 describe('Use Case 204 - Retrieving user data by ID', () => {
+    beforeEach((done) => {
+        console.log('Before each test')
+        done()
+    })
+
     // TC-204-1: Invalid token
     it('TC-204-1 Invalid token', (done) => {
         chai.request(server)

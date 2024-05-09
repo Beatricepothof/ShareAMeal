@@ -10,6 +10,11 @@ tracer.setLevel('warn')
 const endpointToTest = '/api/user/:userId'
 
 describe('Use Case 205 - Updating user data', () => {
+    beforeEach((done) => {
+        console.log('Before each test')
+        done()
+    })
+
     // TC-205-1: Required field "emailAddress" missing
     it('TC-205-1 Required field "emailAddress" missing', (done) => {
         chai.request(server)

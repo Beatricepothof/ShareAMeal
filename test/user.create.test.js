@@ -77,24 +77,23 @@ describe('UC201 Registreren als nieuwe user', () => {
     })
 
     // TC-201-3: Invalid password
-    it('TC-201-2 Ongeldig e-mailadres', (done) => {
+    it('TC-201-3 Ongeldig wachtwoord', (done) => {
         chai.request(server)
             .post(endpointToTest)
             .send({
                 firstName: 'Voornaam',
                 lastName: 'Achternaam',
-                emailAdress: 'ongeldig.email',
-                password: '123456'
+                emailAdress: 'test.mail@server.nl',
+                password: ''
             })
             .end((err, res) => {
                 res.should.have.status(400)
                 res.body.should.be.a('object')
-                res.body.should.have.property('status').equals(400)
                 res.body.should.have
                     .property('message')
-                    .equals('Missing or incorrect email field')
-                res.body.should.have.property('data').that.is.an('object').that
-                    .is.empty
+                    .that.is.a('string')
+                    .contains('Ongeldig wachtwoord')
+                res.body.should.not.have.property('data')
 
                 done()
             })
@@ -105,10 +104,9 @@ describe('UC201 Registreren als nieuwe user', () => {
         chai.request(server)
             .post(endpointToTest)
             .send({
-                firstName: 'Voornaam',
-                lastName: 'Achternaam',
-                emailAdress: 'test.mail@server.nl',
-                password: '123456'
+                firstName: 'Marieke',
+                lastName: 'Jansen',
+                emailAdress: 'm@server.nl'
             })
             .end((err, res) => {
                 res.should.have.status(403)
@@ -118,6 +116,7 @@ describe('UC201 Registreren als nieuwe user', () => {
                     .that.is.a('string')
                     .contains('User already exists')
                 res.body.should.not.have.property('data')
+
                 done()
             })
     })

@@ -36,6 +36,7 @@ app.get('/api/test', (req, res) => {
 
 // Hier komen alle routes
 app.use('/api/auth', authRoutes)
+app.use(userRoutes)
 
 // Hier komen alle routes
 // // UC-201: Registreren als nieuwe user

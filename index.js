@@ -35,7 +35,7 @@ app.get('/api/test', (req, res) => {
 
 // Hier komen alle routes
 // UC-201: Registreren als nieuwe user
-app.post('/api/user', (req, res) => {
+app.post('/api/user', validateUserCreate, (req, res) => {
     const newUser = req.body
     console.log('POST /api/user', newUser)
 

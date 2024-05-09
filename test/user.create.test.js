@@ -50,27 +50,27 @@ describe('UC201 Registreren als nieuwe user', () => {
             })
     })
 
-    // TC-201-2: Invalid email address
-    it('TC-201-2 Invalid email address', (done) => {
+    it('TC-201-2 Ongeldige e-mailadres', (done) => {
         chai.request(server)
             .post(endpointToTest)
             .send({
                 firstName: 'Voornaam',
                 lastName: 'Achternaam',
-                emailAdress: 'invalid.email', // Invalid email address
+                emailAdress: 'ongeldig.email',
                 password: '123456'
             })
             .end((err, res) => {
-                /**
-                 * Using chai.expect for assertion
-                 */
                 chai.expect(res).to.have.status(400)
+                chai.expect(res).not.to.have.status(200)
                 chai.expect(res.body).to.be.a('object')
+                chai.expect(res.body).to.have.property('status').equals(400)
                 chai.expect(res.body)
                     .to.have.property('message')
-                    .that.is.a('string')
-                    .contains('Invalid email address')
-                chai.expect(res.body).not.to.have.property('data')
+                    .equals('Missing or incorrect email field')
+                chai
+                    .expect(res.body)
+                    .to.have.property('data')
+                    .that.is.a('object').that.is.empty
 
                 done()
             })

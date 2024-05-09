@@ -37,12 +37,52 @@ const validateUserCreate = (req, res, next) => {
     }
 }
 
+const validateUserDelete = (req, res, next) => {
+    try {
+        if (!req.headers.authorization) {
+            throw new Error('Authorization header is missing')
+        }
+
+        const authToken = req.headers.authorization.split(' ')[1]
+        if (!authToken) {
+            throw new Error('Not logged in')
+        }
+
+        next()
+    } catch (ex) {
+        logger.trace('User delete validation failed:', ex.message)
+        next({
+            status: 400,
+            message: ex.message,
+            data: {}
+        })
+    }
+}
+
+const validateUserRetrieve = (req, res, next) => {
+    try {
+        // Optionally, you can add validation logic here
+        // For example, you can check if the search parameters are valid
+
+        // If all validations pass, call next middleware
+        next()
+    } catch (ex) {
+        // If any validation fails, handle the error
+        logger.trace('User retrieve validation failed:', ex.message)
+        next({
+            status: 400,
+            message: ex.message,
+            data: {}
+        })
+    }
+}
+
 // Userroutes
 router.post('/api/user', validateUserCreate, userController.create)
-router.get('/api/user', userController.getAll)
+router.get('/api/user', validateUserRetrieve, userController.getAll)
 router.get('/api/user/:userId', userController.getById)
 router.put('/api/user/:userId', userController.update)
-router.delete('/api/user/:userId', userController.delete)
+router.delete('/api/user/:userId', validateUserDelete, userController.delete)
 router.get('/api/user/profile', validateToken, userController.getProfile)
 
 // Tijdelijke routes om niet bestaande routes op te vangen

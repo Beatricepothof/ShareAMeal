@@ -21,13 +21,17 @@ describe('Use Case 206 - Deleting user', () => {
             .delete(endpointToTest)
             .set('Authorization', 'Bearer validtoken')
             .end((err, res) => {
-                res.should.have.status(404)
-                res.body.should.be.a('object')
-                res.body.should.have
-                    .property('message')
+                /**
+                 * Using chai.expect for assertion
+                 */
+                chai.expect(res).to.have.status(404)
+                chai.expect(res.body).to.be.a('object')
+                chai.expect(res.body)
+                    .to.have.property('message')
                     .that.is.a('string')
                     .contains('User does not exist')
-                res.body.should.not.have.property('data')
+                chai.expect(res.body).not.to.have.property('data')
+
                 done()
             })
     })

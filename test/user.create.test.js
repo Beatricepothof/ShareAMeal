@@ -55,13 +55,17 @@ describe('UC-201 Register as new user', () => {
                     password: '123456'
                 })
                 .end((err, res) => {
-                    res.should.have.status(400)
-                    res.body.should.be.a('object')
-                    res.body.should.have
-                        .property('message')
+                    /**
+                     * Using chai.expect for assertion
+                     */
+                    chai.expect(res).to.have.status(400)
+                    chai.expect(res.body).to.be.a('object')
+                    chai.expect(res.body)
+                        .to.have.property('message')
                         .that.is.a('string')
                         .contains('Invalid email address')
-                    res.body.should.not.have.property('data')
+                    chai.expect(res.body).not.to.have.property('data')
+
                     done()
                 })
         })

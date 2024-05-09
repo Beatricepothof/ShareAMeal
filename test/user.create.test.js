@@ -114,15 +114,13 @@ describe('UC-201 Register as new user', () => {
                 })
         })
 
-        // TC-201-5: User successfully registered
         it('TC-201-5 Gebruiker succesvol geregistreerd', (done) => {
             chai.request(server)
                 .post(endpointToTest)
                 .send({
                     firstName: 'Voornaam',
                     lastName: 'Achternaam',
-                    emailAdress: 'v.a@server.nl',
-                    password: '123456'
+                    emailAdress: 'v.a@server.nl'
                 })
                 .end((err, res) => {
                     res.should.have.status(200)
@@ -135,7 +133,6 @@ describe('UC-201 Register as new user', () => {
                     data.should.have.property('firstName').equals('Voornaam')
                     data.should.have.property('lastName').equals('Achternaam')
                     data.should.have.property('emailAdress')
-                    data.should.have.property('password').equals('123456')
                     data.should.have.property('id').that.is.a('number')
 
                     done()

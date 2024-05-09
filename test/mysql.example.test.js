@@ -88,10 +88,10 @@ describe('Example MySql testcase', () => {
                     res.should.have.status(200)
                     res.body.should.be
                         .an('object')
-                        .that.has.all.keys('status', 'result', 'message')
+                        .that.has.all.keys('status', 'message', 'data')
                     res.body.status.should.be.a('number')
 
-                    const data = res.body.result
+                    const data = res.body.data
 
                     data.should.be.an('array').that.has.lengthOf(1)
                     data[0].should.be.an('object').that.has.all.keys(

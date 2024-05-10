@@ -18,73 +18,60 @@ const notFound = (req, res, next) => {
 
 const validateUserCreate = (req, res, next) => {
     try {
+        // Validate required fields
+        const requiredFields = [
+            'firstName',
+            'lastName',
+            'emailAddress',
+            'password',
+            'phoneNumber',
+            'street',
+            'city'
+        ]
+        for (const field of requiredFields) {
+            if (!req.body[field]) {
+                throw new Error(`Missing or incorrect ${field} field`)
+            }
+        }
+
         // Validate firstName field
-        assert(req.body.firstName, 'Missing or incorrect firstName field')
-        chai.expect(req.body.firstName).to.be.a('string')
-        chai.expect(req.body.firstName).to.match(
-            /^[a-zA-Z]+$/,
-            'firstName must be a string'
-        )
+        if (!/^[a-zA-Z]+$/.test(req.body.firstName)) {
+            throw new Error('firstName must be a string')
+        }
 
         // Validate email field
-        assert(req.body.emailAdress, 'Missing or incorrect email field')
-        chai.expect(req.body.emailAdress).to.be.a('string')
-        chai.expect(req.body.emailAdress).to.match(
-            /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,3}$/,
-            'Invalid email address'
-        )
+        if (
+            !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,3}$/.test(
+                req.body.emailAddress
+            )
+        ) {
+            throw new Error('Invalid email address')
+        }
 
         // Validate password field
-        if (!req.body.password || req.body.password.trim() === '') {
-            throw new Error('Missing or incorrect password field')
+        if (!/(?=.*[A-Z])(?=.*\d).{8,}/.test(req.body.password)) {
+            throw new Error('Invalid password')
         }
 
-        chai.expect(req.body.password).to.be.a('string')
-        chai.expect(req.body.password).to.have.length.at.least(8)
-        chai.expect(req.body.password).to.match(
-            /^(?=.*[A-Z])(?=.*\d).{8,}$/,
-            'Invalid password'
-        )
-
-        logger.trace('User successfully validated')
-        next()
-    } catch (ex) {
-        logger.trace('User validation failed:', ex.message)
-        next({
-            status: 400,
-            message: ex.message,
-            data: {}
-        })
-    }
-}
-
-const validateUserDelete = (req, res, next) => {
-    try {
-        if (!req.headers.authorization) {
-            throw new Error('Authorization header is missing')
+        // Validate phoneNumber field
+        if (!/^06-\d{8}$/.test(req.body.phoneNumber)) {
+            throw new Error('Invalid phone number')
         }
 
-        const authToken = req.headers.authorization.split(' ')[1]
-        if (!authToken) {
-            throw new Error('Not logged in')
+        // Validate street field
+        if (typeof req.body.street !== 'string') {
+            throw new Error('street must be a string')
         }
 
-        next()
-    } catch (ex) {
-        logger.trace('User delete validation failed:', ex.message)
-        next({
-            status: 400,
-            message: ex.message,
-            data: {}
-        })
-    }
-}
+        // Validate city field
+        if (typeof req.body.city !== 'string') {
+            throw new Error('city must be a string')
+        }
 
-const validateUserRetrieve = (req, res, next) => {
-    try {
+        logger.trace('User successfully validated for create')
         next()
     } catch (ex) {
-        logger.trace('User validation failed:', ex.message)
+        logger.trace('User validation failed for create:', ex.message)
         next({
             status: 400,
             message: ex.message,
@@ -95,20 +82,20 @@ const validateUserRetrieve = (req, res, next) => {
 
 const validateUserUpdate = (req, res, next) => {
     try {
+        // Validate emailAddress field (always required for updating)
+        assert(req.body.emailAddress, 'Missing or incorrect emailAddress field')
+        chai.expect(req.body.emailAddress).to.be.a('string')
+        chai.expect(req.body.emailAddress).to.match(
+            /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,3}$/,
+            'Invalid email address'
+        )
+
         // Validate firstName field
         assert(req.body.firstName, 'Missing or incorrect firstName field')
         chai.expect(req.body.firstName).to.be.a('string')
         chai.expect(req.body.firstName).to.match(
             /^[a-zA-Z]+$/,
             'firstName must be a string'
-        )
-
-        // Validate email field
-        assert(req.body.emailAdress, 'Missing or incorrect email field')
-        chai.expect(req.body.emailAdress).to.be.a('string')
-        chai.expect(req.body.emailAdress).to.match(
-            /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,3}$/,
-            'Invalid email address'
         )
 
         // Validate password field
@@ -122,6 +109,22 @@ const validateUserUpdate = (req, res, next) => {
             /^(?=.*[A-Z])(?=.*\d).{8,}$/,
             'Invalid password'
         )
+
+        // Validate phoneNumber field
+        assert(req.body.phoneNumber, 'Missing or incorrect phoneNumber field')
+        chai.expect(req.body.phoneNumber).to.be.a('string')
+        chai.expect(req.body.phoneNumber).to.match(
+            /^06[- ]?\d{8}$/,
+            'Invalid phoneNumber'
+        )
+
+        // Validate street field
+        assert(req.body.street, 'Missing or incorrect street field')
+        chai.expect(req.body.street).to.be.a('string')
+
+        // Validate city field
+        assert(req.body.city, 'Missing or incorrect city field')
+        chai.expect(req.body.city).to.be.a('string')
 
         logger.trace('User successfully validated for update')
         next()

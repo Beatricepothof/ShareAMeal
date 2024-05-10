@@ -12,15 +12,25 @@ const database = {
             id: 0,
             firstName: 'Hendrik',
             lastName: 'van Dam',
-            emailAdress: 'hvd@server.nl'
-            // Hier de overige velden uit het functioneel ontwerp
+            emailAdress: 'hvd@server.nl',
+            password: 'test',
+            isActive: true,
+            street: 'Lovensdijkstraat 61',
+            city: 'Breda',
+            phoneNumber: '06 12312345',
+            roles: []
         },
         {
             id: 1,
             firstName: 'Marieke',
             lastName: 'Jansen',
-            emailAdress: 'm@server.nl'
-            // Hier de overige velden uit het functioneel ontwerp
+            emailAdress: 'm@server.nl',
+            password: 'secret',
+            isActive: true,
+            street: 'Steendijk 40',
+            city: 'Den Haag',
+            phoneNumber: '06 54321234',
+            roles: []
         }
     ],
 

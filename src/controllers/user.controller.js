@@ -91,6 +91,7 @@ let userController = {
         logger.info(`Deleting user with id ${userId}`)
         userService.delete(userId, (error, success) => {
             if (error) {
+                logger.error('Error deleting user:', error)
                 return next({
                     status: error.status,
                     message: error.message,
@@ -98,6 +99,7 @@ let userController = {
                 })
             }
             if (success) {
+                logger.info('User deleted successfully')
                 res.status(200).json({
                     status: success.status,
                     message: success.message,

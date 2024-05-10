@@ -44,7 +44,7 @@ const userService = {
             }
 
             connection.query(
-                'SELECT id, firstName, lastName FROM user',
+                'SELECT id, firstName, lastName, isActive, emailAdress, password, phoneNumber, roles, street, city FROM user',
                 (error, results, fields) => {
                     connection.release()
 
@@ -73,7 +73,7 @@ const userService = {
             }
 
             connection.query(
-                'SELECT id, firstName, lastName FROM user WHERE id = ?',
+                'SELECT id, firstName, lastName, isActive, emailadress, password, phoneNumber, roles, street, city FROM user WHERE id = ?',
                 [userId],
                 (error, results, fields) => {
                     connection.release()
@@ -93,7 +93,10 @@ const userService = {
                             )
                             callback(notFoundError, null)
                         } else {
-                            callback(null, results[0])
+                            callback(null, {
+                                message: 'User found successfully.',
+                                data: results[0]
+                            })
                         }
                     }
                 }

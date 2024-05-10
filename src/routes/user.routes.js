@@ -18,11 +18,14 @@ const notFound = (req, res, next) => {
 
 const validateUserCreate = (req, res, next) => {
     try {
+        // Log the email adress just before validation
+        console.log('Email Adress:', req.body.emailAddress)
+
         // Validate required fields
         const requiredFields = [
             'firstName',
             'lastName',
-            'emailAddress',
+            'emailAdress',
             'password',
             'phoneNumber',
             'street',
@@ -41,11 +44,11 @@ const validateUserCreate = (req, res, next) => {
 
         // Validate email field
         if (
-            !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,3}$/.test(
-                req.body.emailAddress
+            !/^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,3})$/.test(
+                req.body.emailAdress
             )
         ) {
-            throw new Error('Invalid email address')
+            throw new Error('Invalid email adress')
         }
 
         // Validate password field
@@ -82,12 +85,12 @@ const validateUserCreate = (req, res, next) => {
 
 const validateUserUpdate = (req, res, next) => {
     try {
-        // Validate emailAddress field (always required for updating)
-        assert(req.body.emailAddress, 'Missing or incorrect emailAddress field')
-        chai.expect(req.body.emailAddress).to.be.a('string')
-        chai.expect(req.body.emailAddress).to.match(
+        // Validate emailAdress field (always required for updating)
+        assert(req.body.emailAdress, 'Missing or incorrect emailAdress field')
+        chai.expect(req.body.emailAdress).to.be.a('string')
+        chai.expect(req.body.emailAdress).to.match(
             /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,3}$/,
-            'Invalid email address'
+            'Invalid email adress'
         )
 
         // Validate firstName field
@@ -140,10 +143,10 @@ const validateUserUpdate = (req, res, next) => {
 
 // Userroutes
 router.post('/api/user', validateUserCreate, userController.create)
-router.get('/api/user', validateUserRetrieve, userController.getAll)
+router.get('/api/user', userController.getAll)
 router.get('/api/user/:userId', userController.getById)
 router.put('/api/user/:userId', validateUserUpdate, userController.update)
-router.delete('/api/user/:userId', validateUserDelete, userController.delete)
+router.delete('/api/user/:userId', userController.delete)
 router.get('/api/user/profile', validateToken, userController.getProfile)
 
 // Tijdelijke routes om niet bestaande routes op te vangen

@@ -88,7 +88,7 @@ let userController = {
 
     delete: (req, res, next) => {
         const userId = req.params.userId
-        logger.info(`Deleting user with id ${userId}`)
+        logger.info(`Attempting to delete user with id ${userId}`)
         userService.delete(userId, (error, success) => {
             if (error) {
                 logger.error('Error deleting user:', error)

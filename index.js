@@ -36,7 +36,7 @@ app.get('/api/test', (req, res) => {
 })
 
 // Hier komen alle routes
-app.use('/api/auth', authRoutes)
+app.use(authRoutes)
 app.use(userRoutes)
 app.use(mealRoutes)
 
@@ -44,7 +44,7 @@ app.use(mealRoutes)
 app.use((req, res, next) => {
     next({
         status: 404,
-        message: 'Route not found',
+        message: 'Route could not be found',
         data: {}
     })
 })

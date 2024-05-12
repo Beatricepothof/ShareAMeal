@@ -4,7 +4,7 @@ const chai = require('chai')
 chai.should()
 const router = express.Router()
 const userController = require('../controllers/user.controller')
-const validateToken = require('./authentication.routes').validateToken
+const { validateToken } = require('./authentication.routes')
 const logger = require('../util/logger')
 
 // Tijdelijke functie om niet bestaande routes op te vangen
@@ -142,11 +142,27 @@ const validateUserUpdate = (req, res, next) => {
 }
 
 // Userroutes
-router.post('/api/user', validateUserCreate, userController.create)
-router.get('/api/user', userController.getAll)
-router.get('/api/user/:userId', userController.getById)
-router.put('/api/user/:userId', validateUserUpdate, userController.update)
-router.delete('/api/user/:userId', userController.delete)
+router.post(
+    '/api/user',
+    validateToken,
+    validateUserCreate,
+    userController.create
+)
+router.get('/api/user', validateToken, userController.getAll)
+router.get('/api/user/:userId', validateToken, userController.getById)
+router.put(
+    '/api/user/:userId',
+    validateToken,
+    validateUserUpdate,
+    userController.update
+)
+router.delete('/api/user/:userId', validateToken, userController.delete)
+router.get(
+    '/api/user/profile',
+    validateToken,
+    validateToken,
+    userController.getProfile
+)
 router.get('/api/user/profile', validateToken, userController.getProfile)
 
 // Tijdelijke routes om niet bestaande routes op te vangen

@@ -114,7 +114,7 @@ const mealService = {
                         logger.error(error)
                         callback(error, null)
                     } else {
-                        logger.debug(results)
+                        logger.debug('Fetched meal:', results[0]) // Added logging here
                         if (results.length === 0) {
                             const notFoundError = new Error(
                                 `Meal with id ${mealId} not found.`
@@ -123,9 +123,17 @@ const mealService = {
                                 'Meal not found:',
                                 notFoundError.message
                             )
-                            callback(notFoundError, null)
+                            callback(notFoundError, {
+                                status: 404,
+                                message: `Meal with id ${mealId} not found`,
+                                data: null
+                            })
                         } else {
-                            callback(null, results[0])
+                            callback(null, {
+                                status: 200,
+                                message: `Found meal with id ${mealId}`,
+                                data: results[0]
+                            })
                         }
                     }
                 }

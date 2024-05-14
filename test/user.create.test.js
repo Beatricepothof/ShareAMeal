@@ -37,7 +37,7 @@ describe('UC201 Registreren als nieuwe user', () => {
                 chai.expect(res.body).to.have.property('status').equals(400)
                 chai.expect(res.body)
                     .to.have.property('message')
-                    .equals('Invalid firstName field')
+                    .equals('Missing or incorrect firstName field')
                 chai
                     .expect(res.body)
                     .to.have.property('data')

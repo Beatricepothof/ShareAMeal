@@ -76,10 +76,7 @@ const mealService = {
             }
 
             connection.query(
-                'SELECT m.*, u.* AS cook, GROUP_CONCAT(p.*) AS participants FROM meal m ' +
-                    'LEFT JOIN user u ON m.cookId = u.id ' +
-                    'LEFT JOIN meal_participants_user p ON p.mealId = m.id ' +
-                    'GROUP BY m.id',
+                'SELECT id, isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl, cookId, createDate, updateDate, name, description, allergenes FROM meal',
                 (error, results, fields) => {
                     connection.release()
 
@@ -108,10 +105,7 @@ const mealService = {
             }
 
             connection.query(
-                'SELECT m.*, u.* AS cook, GROUP_CONCAT(p.*) AS participants FROM meal m ' +
-                    'LEFT JOIN user u ON m.cookId = u.id ' +
-                    'LEFT JOIN meal_participants_user p ON p.mealId = m.id ' +
-                    'WHERE m.id = ? GROUP BY m.id',
+                'SELECT id, isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl, cookId, createDate, updateDate, name, description, allergenes FROM meal WHERE id = ?',
                 [mealId],
                 (error, results, fields) => {
                     connection.release()

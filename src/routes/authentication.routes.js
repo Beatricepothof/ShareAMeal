@@ -11,10 +11,7 @@ const authController = require('../controllers/authentication.controller')
 
 function validateRegistration(req, res, next) {
     try {
-        // Log the email adress just before validation
-        console.log('Email Adress:', req.body.emailAddress)
-
-        // Validate required fields
+        // Validate required fields for registration
         const requiredFields = [
             'firstName',
             'lastName',
@@ -25,52 +22,16 @@ function validateRegistration(req, res, next) {
             'city'
         ]
         for (const field of requiredFields) {
-            if (!req.body[field]) {
-                throw new Error(`Missing or incorrect ${field} field`)
-            }
+            assert(req.body[field], `Missing ${field} field`)
         }
 
-        // Validate firstName field
-        if (!/^[a-zA-Z]+$/.test(req.body.firstName)) {
-            throw new Error('firstName must be a string')
-        }
+        // Additional validation for email, password, and other fields if needed
 
-        // Validate email field
-        if (
-            !/^[a-zA-Z]+\.[a-zA-Z]{2,}@[a-zA-Z]{2,}\.[a-zA-Z]{2,3}$/.test(
-                req.body.emailAdress
-            )
-        ) {
-            throw new Error('Invalid email adress')
-        }
-
-        // Validate password field
-        if (!/^(?=.*[A-Z])(?=.*\d).{8,}$/.test(req.body.password)) {
-            throw new Error('Invalid password')
-        }
-
-        // Validate phoneNumber field
-        if (!/^06-\d{8}$/.test(req.body.phoneNumber)) {
-            throw new Error('Invalid phone number')
-        }
-
-        // Validate street field
-        if (typeof req.body.street !== 'string') {
-            throw new Error('street must be a string')
-        }
-
-        // Validate city field
-        if (typeof req.body.city !== 'string') {
-            throw new Error('city must be a string')
-        }
-
-        logger.trace('User successfully validated for create')
         next()
-    } catch (ex) {
-        logger.trace('User validation failed for create:', ex.message)
+    } catch (error) {
         next({
             status: 400,
-            message: ex.message,
+            message: error.message,
             data: {}
         })
     }

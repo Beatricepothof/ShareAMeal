@@ -164,7 +164,6 @@ router.get(
     userController.getProfile
 )
 router.get('/api/user/profile', validateToken, userController.getProfile)
-router.get('/api/user', validateToken, userController.getUsersFilteredBy)
 
 // Tijdelijke routes om niet bestaande routes op te vangen
 // router.put('/api/user/:userId', notFound)

@@ -46,7 +46,6 @@ const validateMealUpdate = (req, res, next) => {
     }
 }
 
-// Routes for meal CRUD operations
 router.post(
     '/api/meal',
     validateToken,

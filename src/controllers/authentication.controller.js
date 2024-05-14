@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 const db = require('../dao/mysql-db')
 const logger = require('../util/logger')
-const config = require('../util/config') // Import your application configuration
+const config = require('../util/config')
 
 const jwtSecretKey = config.secretkey // Use the secret key from the configuration
 
@@ -12,7 +12,7 @@ const authController = {
         db.getConnection((err, connection) => {
             if (err) {
                 logger.error(err)
-                return next(err) // Pass error to the Express error handler
+                return next(err)
             }
             if (connection) {
                 // 1. Check if the user account exists.
@@ -106,12 +106,12 @@ const authController = {
                         return
                     }
 
-                    // If registration was successful, return the generated user ID along with the registration data
-                    const userId = results.insertId // ID of the newly registered user
+                    // If registration was successful, then return the generated user ID along with the registration data
+                    const userId = results.insertId
                     callback(null, {
-                        status: 201, // Status code for successful creation
+                        status: 201,
                         message: 'User registered successfully',
-                        data: { userId, ...userData } // Include the new user ID and other register info in the response
+                        data: { userId, ...userData }
                     })
                 }
             )

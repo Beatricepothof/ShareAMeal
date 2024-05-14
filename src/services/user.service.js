@@ -194,7 +194,7 @@ const userService = {
     },
 
     getProfile: (userId, callback) => {
-        // Query the database to retrieve user profile details
+        // retrieve user profile details
         db.query('SELECT * FROM user WHERE id = ?', [userId], (err, rows) => {
             if (err) {
                 logger.error('Error retrieving user profile:', err)
@@ -213,7 +213,7 @@ const userService = {
                 })
             }
 
-            // Retrieve meals associated with the user
+            // Retrieve meals linked with the user
             db.query(
                 'SELECT * FROM meal WHERE cookId = ?',
                 [userId],
@@ -229,11 +229,10 @@ const userService = {
 
                     // Construct the user profile object with meals
                     const userProfile = {
-                        user: rows[0], // Assuming user profile details are in the first row
-                        meals: mealRows // Assuming meals associated with the user are in mealRows
+                        user: rows[0],
+                        meals: mealRows
                     }
 
-                    // Send the user profile details to the controller
                     callback(null, {
                         status: 200,
                         message: 'User profile retrieved successfully',

@@ -93,7 +93,7 @@ const validateUserUpdate = (req, res, next) => {
             'Invalid email adress'
         )
 
-        // Validate firstName field
+        // Validate first name field
         assert(req.body.firstName, 'Missing or incorrect firstName field')
         chai.expect(req.body.firstName).to.be.a('string')
         chai.expect(req.body.firstName).to.match(

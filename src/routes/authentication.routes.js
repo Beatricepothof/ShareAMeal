@@ -12,7 +12,7 @@ const authController = require('../controllers/authentication.controller')
 function validateRegistration(req, res, next) {
     try {
         // Log the email address just before validation
-        console.log('Email Address:', req.body.emailAddress)
+        // console.log('Email Address:', req.body.emailAddress)
 
         // Validate required fields for registration
         const requiredFields = [
@@ -28,7 +28,7 @@ function validateRegistration(req, res, next) {
             assert(req.body[field], `Missing ${field} field`)
         }
 
-        // Validate firstName field
+        // Validate first name field
         assert(
             /^[a-zA-Z]+$/.test(req.body.firstName),
             'firstName must be a string'
@@ -48,7 +48,7 @@ function validateRegistration(req, res, next) {
             'Invalid password'
         )
 
-        // Validate phoneNumber field
+        // Validate phone number field
         assert(/^06-\d{8}$/.test(req.body.phoneNumber), 'Invalid phone number')
 
         // Validate street field
@@ -62,7 +62,6 @@ function validateRegistration(req, res, next) {
 
         next()
     } catch (error) {
-        // Log failure
         console.log('User validation failed for create:', error.message)
         next({
             status: 400,
@@ -73,7 +72,6 @@ function validateRegistration(req, res, next) {
 }
 
 function validateLogin(req, res, next) {
-    // Verify that we receive the expected input
     try {
         assert(
             typeof req.body.emailAdress === 'string',
@@ -93,9 +91,6 @@ function validateLogin(req, res, next) {
     }
 }
 
-//
-//
-//
 function validateToken(req, res, next) {
     logger.info('validateToken called')
     logger.trace('Headers:', req.headers)
@@ -109,10 +104,9 @@ function validateToken(req, res, next) {
             data: {}
         })
     } else {
-        // Strip the word 'Bearer ' from the headervalue
         const token = authHeader.substring(7, authHeader.length)
 
-        // Verify the token
+        // Token verification
         jwt.verify(token, jwtSecretKey, (err, payload) => {
             if (err) {
                 logger.warn('Token verification failed:', err.message)
@@ -134,12 +128,7 @@ function validateToken(req, res, next) {
             }
 
             logger.debug('Token verification successful:', payload)
-            /**
-             * User has access.
-             * IMPORTANT! Add UserId from payload to the request,
-             * so it's available for subsequent endpoints.
-             * You will then always have access to the userId of the logged-in user.
-             */
+
             req.userId = payload.userId
             next()
         })

@@ -33,7 +33,7 @@ const authController = {
                             rows.length === 1 &&
                             rows[0].password === userCredentials.password
                         ) {
-                            // Passwords match, generate JWT token
+                            // If password match, generate JWT token
                             const { password, ...userinfo } = rows[0]
                             const payload = {
                                 userId: userinfo.id
@@ -97,7 +97,6 @@ const authController = {
                             return
                         }
                         if (rows[0].count > 0) {
-                            // Email address already in use
                             logger.debug('Email address already in use')
                             callback(
                                 {
@@ -107,7 +106,6 @@ const authController = {
                                 null
                             )
                         } else {
-                            // Email address available, create new user
                             connection.query(
                                 'INSERT INTO `user` SET ?',
                                 userData,

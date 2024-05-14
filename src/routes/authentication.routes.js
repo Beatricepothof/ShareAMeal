@@ -11,8 +11,8 @@ const authController = require('../controllers/authentication.controller')
 
 function validateRegistration(req, res, next) {
     try {
-        // Log the email adress just before validation
-        console.log('Email Adress:', req.body.emailAddress)
+        // Logging email adress just before validation to check if its correct
+        // console.log('Email Adress:', req.body.emailAddress)
 
         // Validate required fields
         const requiredFields = [

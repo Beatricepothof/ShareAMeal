@@ -11,11 +11,14 @@ const authController = require('../controllers/authentication.controller')
 
 function validateRegistration(req, res, next) {
     try {
+        // Log the email address just before validation
+        console.log('Email Address:', req.body.emailAddress)
+
         // Validate required fields for registration
         const requiredFields = [
             'firstName',
             'lastName',
-            'emailAdress',
+            'emailAddress',
             'password',
             'phoneNumber',
             'street',
@@ -25,10 +28,42 @@ function validateRegistration(req, res, next) {
             assert(req.body[field], `Missing ${field} field`)
         }
 
-        // Additional validation for email, password, and other fields if needed
+        // Validate firstName field
+        assert(
+            /^[a-zA-Z]+$/.test(req.body.firstName),
+            'firstName must be a string'
+        )
+
+        // Validate email field
+        assert(
+            /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,3})$/.test(
+                req.body.emailAddress
+            ),
+            'Invalid email address'
+        )
+
+        // Validate password field
+        assert(
+            /(?=.*[A-Z])(?=.*\d).{8,}/.test(req.body.password),
+            'Invalid password'
+        )
+
+        // Validate phoneNumber field
+        assert(/^06-\d{8}$/.test(req.body.phoneNumber), 'Invalid phone number')
+
+        // Validate street field
+        assert(typeof req.body.street === 'string', 'street must be a string')
+
+        // Validate city field
+        assert(typeof req.body.city === 'string', 'city must be a string')
+
+        // Log success
+        console.log('User successfully validated for create')
 
         next()
     } catch (error) {
+        // Log failure
+        console.log('User validation failed for create:', error.message)
         next({
             status: 400,
             message: error.message,

@@ -28,6 +28,8 @@ describe('UC101 Inloggen', () => {
         chai.request(server)
             .post(endpointToTest)
             .send({
+                firstName: 'Voornaam',
+                lastName: 'Achternaam',
                 // emailAdress: 'emailAdress', ontbreekt
                 password: 'password'
             })
@@ -37,7 +39,7 @@ describe('UC101 Inloggen', () => {
                 chai.expect(res.body).to.have.property('status').equals(400)
                 chai.expect(res.body)
                     .to.have.property('message')
-                    .equals('email must be a string.')
+                    .equals('Missing or incorrect emailAdress field')
                 chai
                     .expect(res.body)
                     .to.have.property('data')

@@ -14,6 +14,8 @@ require('dotenv').config()
 chai.should()
 chai.use(chaiHttp)
 
+const endpointToTest = '/api/user'
+
 /**
  * Db queries to clear and fill the test database before each test.
  */

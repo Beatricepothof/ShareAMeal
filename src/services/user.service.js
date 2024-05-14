@@ -1,5 +1,6 @@
 const logger = require('../util/logger')
 const db = require('../dao/mysql-db')
+const { getUsersFilteredBy } = require('../controllers/user.controller')
 
 const userService = {
     create: (user, callback) => {
@@ -241,6 +242,43 @@ const userService = {
                     })
                 }
             )
+        })
+    },
+
+    getUsersFilteredBy: (field1, field2, callback) => {
+        logger.info('Fetching users with optional filtering')
+
+        let sql = 'SELECT * FROM users'
+        const values = []
+
+        if (field1 && field2) {
+            sql += ' WHERE field1 = ? AND field2 = ?'
+            values.push(field1, field2)
+        } else if (field1) {
+            sql += ' WHERE field1 = ?'
+            values.push(field1)
+        } else if (field2) {
+            sql += ' WHERE field2 = ?'
+            values.push(field2)
+        }
+
+        db.getConnection((err, connection) => {
+            if (err) {
+                logger.error(err)
+                return callback(err, null)
+            }
+
+            connection.query(sql, values, (error, results, fields) => {
+                connection.release()
+
+                if (error) {
+                    logger.error(error)
+                    return callback(error, null)
+                }
+
+                logger.debug('Fetched users with optional filtering:', results)
+                callback(null, results)
+            })
         })
     }
 }

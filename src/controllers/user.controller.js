@@ -128,6 +128,27 @@ let userController = {
                 })
             }
         })
+    },
+
+    getUsersFilteredBy: (req, res, next) => {
+        const field1 = req.query.field1
+        const field2 = req.query.field2
+
+        userService.getUsers(field1, field2, (error, users) => {
+            if (error) {
+                return next({
+                    status: 500,
+                    message: 'Failed to fetch users with optional filtering',
+                    data: {}
+                })
+            }
+
+            res.status(200).json({
+                status: 200,
+                message: 'Users fetched successfully',
+                data: users
+            })
+        })
     }
 }
 

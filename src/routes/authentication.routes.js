@@ -18,7 +18,7 @@ function validateRegistration(req, res, next) {
         const requiredFields = [
             'firstName',
             'lastName',
-            'emailAddress',
+            'emailAdress',
             'password',
             'phoneNumber',
             'street',

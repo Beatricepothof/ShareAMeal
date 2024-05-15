@@ -32,9 +32,6 @@
 //     'INSERT INTO `user` (`id`, `firstName`, `lastName`, `emailAdress`, `password`, `street`, `city` ) VALUES' +
 //     '(2, "first", "last", "name@server.nl", "secret", "street", "city");'
 
-// 'INSERT INTO `user` (`id`, `firstName`, `lastName`, `emailAdress`, `password`, `street`, `city` ) VALUES' +
-//     '(0, "Hendrik", "van Dam", "hvd@server.nl", "secret", "street", "city");'
-
 // /**
 //  * Query om twee meals toe te voegen. Let op de cookId, die moet matchen
 //  * met een bestaande user in de database.

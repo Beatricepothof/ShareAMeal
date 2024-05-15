@@ -37,7 +37,7 @@ function validateRegistration(req, res, next) {
         // Validate email field
         assert(
             /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,3})$/.test(
-                req.body.emailAddress
+                req.body.emailAdress
             ),
             'Invalid email address'
         )

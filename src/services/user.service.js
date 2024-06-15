@@ -194,52 +194,92 @@ const userService = {
     },
 
     getProfile: (userId, callback) => {
-        // retrieve user profile details
-        db.query('SELECT * FROM user WHERE id = ?', [userId], (err, rows) => {
+        logger.info('Fetching profile for user with ID:', userId)
+        db.getConnection((err, connection) => {
             if (err) {
-                logger.error('Error retrieving user profile:', err)
-                return callback({
-                    status: 500,
-                    message: 'Internal Server Error',
-                    data: {}
-                })
+                logger.error(err)
+                callback(err, null)
+                return
             }
 
-            if (rows.length === 0) {
-                return callback({
-                    status: 404,
-                    message: 'User not found',
-                    data: {}
-                })
-            }
+            const userProfileQuery = 'SELECT * FROM `user` WHERE id = ?'
+            const userMealsQuery =
+                'SELECT * FROM `meal` WHERE cookId = ? AND dateTime >= NOW()'
 
-            // Retrieve meals linked with the user
-            db.query(
-                'SELECT * FROM meal WHERE cookId = ?',
+            connection.query(
+                userProfileQuery,
                 [userId],
-                (err, mealRows) => {
-                    if (err) {
-                        logger.error('Error retrieving meals:', err)
-                        return callback({
-                            status: 500,
-                            message: 'Internal Server Error',
-                            data: {}
-                        })
+                (error, userResults) => {
+                    if (error) {
+                        connection.release()
+                        logger.error(error)
+                        callback(error, null)
+                        return
                     }
 
-                    // Construct the user profile object with meals
-                    const userProfile = {
-                        user: rows[0],
-                        meals: mealRows
+                    if (userResults.length === 0) {
+                        connection.release()
+                        const notFoundError = new Error(
+                            `User with ID ${userId} not found.`
+                        )
+                        logger.info(notFoundError.message)
+                        callback(notFoundError, null)
+                        return
                     }
 
-                    callback(null, {
-                        status: 200,
-                        message: 'User profile retrieved successfully',
-                        data: userProfile
-                    })
+                    connection.query(
+                        userMealsQuery,
+                        [userId],
+                        (mealError, mealResults) => {
+                            connection.release()
+
+                            if (mealError) {
+                                logger.error(mealError)
+                                callback(mealError, null)
+                            } else {
+                                callback(null, {
+                                    user: userResults[0],
+                                    meals: mealResults
+                                })
+                            }
+                        }
+                    )
                 }
             )
+        })
+    },
+
+    getByFilters: (filters, callback) => {
+        logger.info('Fetching users with filters:', filters)
+        db.getConnection((err, connection) => {
+            if (err) {
+                logger.error(err)
+                callback(err, null)
+                return
+            }
+
+            let query = 'SELECT * FROM `user` WHERE 1=1'
+            const queryParams = []
+
+            Object.keys(filters).forEach((key) => {
+                query += ` AND ${key} = ?`
+                queryParams.push(filters[key])
+            })
+
+            connection.query(query, queryParams, (error, results) => {
+                connection.release()
+
+                if (error) {
+                    logger.error(error)
+                    callback(error, null)
+                } else {
+                    logger.debug('Filtered users:', results)
+                    callback(null, {
+                        message: `Found ${results.length} users.`,
+                        data: results
+                    })
+                }
+            })
         })
     }
 }

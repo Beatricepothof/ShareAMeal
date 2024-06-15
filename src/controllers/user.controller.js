@@ -111,22 +111,41 @@ let userController = {
 
     getProfile: (req, res, next) => {
         const userId = req.userId
-        logger.trace('getProfile for userId', userId)
-        userService.getProfile(userId, (error, success) => {
+        logger.info('Getting profile for user ID:', userId)
+
+        userService.getProfile(userId, (error, result) => {
             if (error) {
                 return next({
-                    status: error.status,
-                    message: error.message,
+                    status: error.status || 500,
+                    message: error.message || 'Internal Server Error',
                     data: {}
                 })
             }
-            if (success) {
-                res.status(200).json({
-                    status: 200,
-                    message: success.message,
-                    data: success.data
+
+            res.status(200).json({
+                status: 200,
+                message: 'User profile fetched successfully',
+                data: result
+            })
+        })
+    },
+
+    getByFilters: (req, res, next) => {
+        const filters = req.query
+        logger.info('Getting users by filters:', filters)
+        userService.getByFilters(filters, (error, success) => {
+            if (error) {
+                return next({
+                    status: error.status || 500,
+                    message: error.message || 'Internal Server Error',
+                    data: {}
                 })
             }
+            res.status(200).json({
+                status: 200,
+                message: success.message,
+                data: success.data
+            })
         })
     }
 }

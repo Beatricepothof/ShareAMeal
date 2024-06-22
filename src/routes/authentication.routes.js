@@ -1,6 +1,3 @@
-//
-// Authentication routes
-//
 const assert = require('assert')
 const jwt = require('jsonwebtoken')
 const jwtSecretKey = require('../util/config').secretkey
@@ -84,7 +81,7 @@ function validateLogin(req, res, next) {
         next()
     } catch (ex) {
         next({
-            status: 409,
+            status: 400,
             message: ex.toString(),
             data: {}
         })
@@ -99,7 +96,7 @@ function validateToken(req, res, next) {
     if (!authHeader) {
         logger.warn('Authorization header missing!')
         next({
-            status: 401,
+            status: 404,
             message: 'Unautorized! Log in to get access.',
             data: {}
         })

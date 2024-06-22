@@ -58,10 +58,11 @@ const authController = {
                                             'User logged in, sending: ',
                                             userinfo
                                         )
+                                        // Ensure sensitive information like password is not included in the log
                                         res.status(200).json({
                                             status: 200,
                                             message: 'User logged in',
-                                            data: { ...userinfo, token }
+                                            data: { ...userinfo, token } // userinfo already excludes password
                                         })
                                     }
                                 )
@@ -69,8 +70,8 @@ const authController = {
                                 logger.debug(
                                     'User not found or password invalid'
                                 )
-                                res.status(409).json({
-                                    status: 409,
+                                res.status(404).json({
+                                    status: 404,
                                     message:
                                         'User not found or password invalid',
                                     data: {}

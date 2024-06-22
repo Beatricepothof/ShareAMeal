@@ -103,7 +103,19 @@ const authController = {
 
                     if (err) {
                         logger.error('Error registering user:', err)
-                        callback(err, null)
+                        // Check for duplicate entry error
+                        if (err.code === 'ER_DUP_ENTRY') {
+                            callback(
+                                {
+                                    status: 403,
+                                    message: 'User already exists',
+                                    data: {}
+                                },
+                                null
+                            )
+                        } else {
+                            callback(err, null)
+                        }
                         return
                     }
 

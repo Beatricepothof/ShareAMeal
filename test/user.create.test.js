@@ -1,116 +1,152 @@
-// const chai = require('chai')
-// const chaiHttp = require('chai-http')
-// const server = require('../index')
-// const tracer = require('tracer')
+const chai = require('chai')
+const chaiHttp = require('chai-http')
+const server = require('../index')
+const tracer = require('tracer')
+const app = require('../index.js')
 
-// chai.should()
-// chai.use(chaiHttp)
-// tracer.setLevel('warn')
+chai.should()
+const expect = chai.expect
+chai.use(chaiHttp)
+tracer.setLevel('warn')
 
-// const endpointToTest = '/api/user'
+const endpointToTest = '/api/user'
 
-// describe('UC101 Inloggen', () => {
-//     /**
-//      * Voorbeeld van een beforeEach functie.
-//      * Hiermee kun je code hergebruiken of initialiseren.
-//      */
-//     beforeEach((done) => {
-//         console.log('Before each test')
-//         done()
-//     })
+describe('User Registration and Query API Tests', () => {
+    // UC-201: User Registration Tests
 
-//     /**
-//      * Hier starten de testcases
-//      */
+    // TC-201-1: Missing Required Field
+    it('TC-201-1 should return 400 when a required field is missing', (done) => {
+        chai.request(app)
+            .post('/api/user')
+            .send({
+                lastName: 'Doe',
+                emailAdress: 'john.doe@example.com',
+                password: 'Password123',
+                phoneNumber: '06-12345678',
+                street: 'Main Street',
+                city: 'New York'
+                // Missing firstName intentionally
+            })
+            .end((err, res) => {
+                // Check for error
+                if (err) {
+                    console.error(err) // Log the error for debugging
+                    done(err) // Complete the test with the error
+                    return
+                }
 
-//     // TC-101-1: Verplicht veld ontbreekt
-//     it('TC-101-1 Verplicht veld ontbreekt', (done) => {
-//         chai.request(server)
-//             .post(endpointToTest)
-//             .send({
-//                 firstName: 'Voornaam',
-//                 lastName: 'Achternaam',
-//                 // emailAdress: 'emailAdress', ontbreekt
-//                 password: 'password'
-//             })
-//             .end((err, res) => {
-//                 chai.expect(res).to.have.status(400)
-//                 chai.expect(res.body).to.be.a('object')
-//                 chai.expect(res.body).to.have.property('status').equals(400)
-//                 chai.expect(res.body)
-//                     .to.have.property('message')
-//                     .equals('Missing or incorrect emailAdress field')
-//                 chai
-//                     .expect(res.body)
-//                     .to.have.property('data')
-//                     .that.is.a('object').that.is.empty
+                // Assertions for response
+                expect(res).to.have.status(400)
+                expect(res.body).to.be.an('object')
+                expect(res.body)
+                    .to.have.property('message')
+                    .that.includes('Missing')
+                expect(res.body).to.have.property('data').that.is.empty
+                done() // Complete the test
+            })
+    })
 
-//                 done()
-//             })
-//     })
+    // TC-201-2: Invalid Email Address
+    it('TC-201-2 should return 400 when email address is invalid', (done) => {
+        chai.request(app)
+            .post('/api/user')
+            .send({
+                firstName: 'John',
+                lastName: 'Doe',
+                emailAdress: 'invalid_email',
+                password: 'Password123',
+                phoneNumber: '06-12345678',
+                street: 'Main Street',
+                city: 'New York'
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(400)
+                expect(res.body).to.be.an('object')
+                expect(res.body)
+                    .to.have.property('message')
+                    .that.includes('Invalid email address')
+                expect(res.body).to.have.property('data').that.is.empty
+                done()
+            })
+    })
 
-//     // TC-101-2: Niet-valide wachtwoord
-//     it('TC-101-2 Niet-valide wachtwoord', (done) => {
-//         chai.request(server)
-//             .post(endpointToTest)
-//             .send({
-//                 emailAdress: 'test@mail.com',
-//                 password: 12345 // invalid password format
-//             })
-//             .end((err, res) => {
-//                 chai.expect(res).to.have.status(409)
-//                 chai.expect(res.body).to.be.a('object')
-//                 chai.expect(res.body)
-//                     .to.have.property('message')
-//                     .equals('AssertionError: password must be a string.')
-//                 chai.expect(res.body).not.to.have.property('data')
+    // TC-201-3: Invalid Password
+    it('TC-201-3 should return 400 when password is invalid', (done) => {
+        chai.request(app)
+            .post('/api/user')
+            .send({
+                firstName: 'John',
+                lastName: 'Doe',
+                emailAdress: 'john.doe@example.com',
+                password: 'weakpass',
+                phoneNumber: '06-12345678',
+                street: 'Main Street',
+                city: 'New York'
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(400)
+                expect(res.body).to.be.an('object')
+                expect(res.body)
+                    .to.have.property('message')
+                    .that.includes('Invalid password')
+                expect(res.body).to.have.property('data').that.is.empty
+                done()
+            })
+    })
 
-//                 done()
-//             })
-//     })
+    // TC-201-4: User Already Exists
+    it('TC-201-4 should return 403 when user already exists', (done) => {
+        chai.request(app)
+            .post('/api/user')
+            .send({
+                firstName: 'John',
+                lastName: 'Doe',
+                emailAdress: 'existing.user@example.com',
+                password: 'Password123',
+                phoneNumber: '06-12345678',
+                street: 'Main Street',
+                city: 'New York'
+            })
+            .end((err, res) => {
+                expect(res).to.have.status(403)
+                expect(res.body).to.be.an('object')
+                expect(res.body)
+                    .to.have.property('message')
+                    .that.includes('User already exists')
+                expect(res.body).to.have.property('data').that.is.empty
+                done()
+            })
+    })
 
-//     // TC-101-3: Gebruiker bestaat niet
-//     it('TC-101-3 Gebruiker bestaat niet', (done) => {
-//         chai.request(server)
-//             .post(endpointToTest)
-//             .send({
-//                 emailAdress: 'nonexistent@mail.com',
-//                 password: 'password123'
-//             })
-//             .end((err, res) => {
-//                 chai.expect(res).to.have.status(404)
-//                 chai.expect(res.body).to.be.a('object')
-//                 chai.expect(res.body)
-//                     .to.have.property('message')
-//                     .equals('User does not exist')
-//                 chai.expect(res.body).not.to.have.property('data')
+    // TC-201-5: Successful Registration
+    it('TC-201-5 should return 201 and user data when registration is successful', (done) => {
+        chai.request(app)
+            .post('/api/user')
+            .send({
+                firstName: 'Jane',
+                lastName: 'Smith',
+                emailAdress: 'unique.email@example.com', // Use a unique email address
+                password: 'StrongPassword123',
+                phoneNumber: '06-87654321',
+                street: 'Broadway',
+                city: 'Los Angeles'
+            })
+            .end((err, res) => {
+                // Check for error
+                if (err) {
+                    console.error(err) // Log the error for debugging
+                    done(err) // Complete the test with the error
+                    return
+                }
 
-//                 done()
-//             })
-//     })
-
-//     // TC-101-4: Gebruiker succesvol ingelogd
-//     it('TC-101-4 Gebruiker succesvol ingelogd', (done) => {
-//         chai.request(server)
-//             .post(endpointToTest)
-//             .send({
-//                 emailAdress: 'test@mail.com',
-//                 password: 'password123'
-//             })
-//             .end((err, res) => {
-//                 chai.expect(res).to.have.status(200)
-//                 chai.expect(res.body).to.be.a('object')
-//                 chai.expect(res.body)
-//                     .to.have.property('data')
-//                     .that.is.a('object')
-//                 chai.expect(res.body)
-//                     .to.have.property('message')
-//                     .that.is.a('string')
-//                 chai.expect(res.body.data)
-//                     .to.have.property('token')
-//                     .that.is.a('string')
-
-//                 done()
-//             })
-//     })
-// })
+                // Assertions for response
+                expect(res).to.have.status(201)
+                expect(res.body).to.be.an('object')
+                expect(res.body)
+                    .to.have.property('message')
+                    .that.includes('User registered successfully')
+                expect(res.body).to.have.property('data').that.is.an('object')
+                done() // Complete the test
+            })
+    })
+})

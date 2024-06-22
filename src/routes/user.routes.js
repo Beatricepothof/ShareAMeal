@@ -148,9 +148,8 @@ router.post(
     validateUserCreate,
     userController.create
 )
+// Handles both getAll and getByFilters
 router.get('/api/user', validateToken, userController.getAll)
-// Get user based on filters
-router.get('/api/user', validateToken, userController.getByFilters)
 router.get('/api/user/:userId', validateToken, userController.getById)
 router.put(
     '/api/user/:userId',

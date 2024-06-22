@@ -194,58 +194,39 @@ const userService = {
     },
 
     getProfile: (userId, callback) => {
-        logger.info('Fetching profile for user with ID:', userId)
-        db.getConnection((err, connection) => {
+        const query = 'SELECT * FROM users WHERE id = ?'
+
+        mysqlPool.getConnection((err, connection) => {
             if (err) {
-                logger.error(err)
-                callback(err, null)
-                return
+                return callback({
+                    status: 500,
+                    message: 'Error connecting to database.',
+                    error: err
+                })
             }
 
-            const userProfileQuery = 'SELECT * FROM `user` WHERE id = ?'
-            const userMealsQuery =
-                'SELECT * FROM `meal` WHERE cookId = ? AND dateTime >= NOW()'
+            connection.query(query, [userId], (error, results) => {
+                connection.release() // Release the connection
 
-            connection.query(
-                userProfileQuery,
-                [userId],
-                (error, userResults) => {
-                    if (error) {
-                        connection.release()
-                        logger.error(error)
-                        callback(error, null)
-                        return
-                    }
-
-                    if (userResults.length === 0) {
-                        connection.release()
-                        const notFoundError = new Error(
-                            `User with ID ${userId} not found.`
-                        )
-                        logger.info(notFoundError.message)
-                        callback(notFoundError, null)
-                        return
-                    }
-
-                    connection.query(
-                        userMealsQuery,
-                        [userId],
-                        (mealError, mealResults) => {
-                            connection.release()
-
-                            if (mealError) {
-                                logger.error(mealError)
-                                callback(mealError, null)
-                            } else {
-                                callback(null, {
-                                    user: userResults[0],
-                                    meals: mealResults
-                                })
-                            }
-                        }
-                    )
+                if (error) {
+                    return callback({
+                        status: 500,
+                        message: 'Error executing query.',
+                        error: error
+                    })
                 }
-            )
+
+                if (results.length === 0) {
+                    return callback({
+                        status: 404,
+                        message: `User with id ${userId} not found.`
+                    })
+                }
+
+                // Assuming you want to return only one user (first one found)
+                const user = results[0]
+                callback(null, user)
+            })
         })
     },
 
@@ -261,9 +242,9 @@ const userService = {
             let query = 'SELECT * FROM `user` WHERE 1=1'
             const queryParams = []
 
-            Object.keys(filters).forEach((key) => {
-                query += ` AND ${key} = ?`
-                queryParams.push(filters[key])
+            Object.keys(filters).forEach((filter) => {
+                query += ` AND ${filter} = ?`
+                queryParams.push(filters[filter])
             })
 
             connection.query(query, queryParams, (error, results) => {

@@ -24,23 +24,43 @@ let userController = {
     },
 
     getAll: (req, res, next) => {
-        logger.trace('getAll')
-        userService.getAll((error, success) => {
-            if (error) {
-                return next({
-                    status: error.status,
-                    message: error.message,
-                    data: {}
-                })
-            }
-            if (success) {
+        const filters = req.query
+
+        if (Object.keys(filters).length > 0) {
+            logger.info('Fetching users with filters:', filters)
+            userService.getByFilters(filters, (error, result) => {
+                if (error) {
+                    return next({
+                        status: error.status || 500,
+                        message: error.message || 'Internal Server Error',
+                        data: {}
+                    })
+                }
+
                 res.status(200).json({
                     status: 200,
-                    message: success.message,
-                    data: success.data
+                    message: 'Filtered users retrieved successfully',
+                    data: result
                 })
-            }
-        })
+            })
+        } else {
+            logger.info('Fetching all users')
+            userService.getAll((error, result) => {
+                if (error) {
+                    return next({
+                        status: error.status || 500,
+                        message: error.message || 'Internal Server Error',
+                        data: {}
+                    })
+                }
+
+                res.status(200).json({
+                    status: 200,
+                    message: 'All users retrieved successfully',
+                    data: result
+                })
+            })
+        }
     },
 
     getById: (req, res, next) => {
@@ -111,40 +131,22 @@ let userController = {
 
     getProfile: (req, res, next) => {
         const userId = req.userId
-        logger.info('Getting profile for user ID:', userId)
 
-        userService.getProfile(userId, (error, result) => {
-            if (error) {
+        userService.getProfile(userId, (err, profile) => {
+            if (err) {
                 return next({
-                    status: error.status || 500,
-                    message: error.message || 'Internal Server Error',
-                    data: {}
+                    status: err.status || 500,
+                    message: err.message || 'Internal Server Error',
+                    data: err.data || {}
                 })
             }
 
             res.status(200).json({
                 status: 200,
-                message: 'User profile fetched successfully',
-                data: result
-            })
-        })
-    },
-
-    getByFilters: (req, res, next) => {
-        const filters = req.query
-        logger.info('Getting users by filters:', filters)
-        userService.getByFilters(filters, (error, success) => {
-            if (error) {
-                return next({
-                    status: error.status || 500,
-                    message: error.message || 'Internal Server Error',
-                    data: {}
-                })
-            }
-            res.status(200).json({
-                status: 200,
-                message: success.message,
-                data: success.data
+                message: 'User profile retrieved successfully.',
+                data: {
+                    profile
+                }
             })
         })
     }

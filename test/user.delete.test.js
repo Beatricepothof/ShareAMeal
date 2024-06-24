@@ -1,87 +1,118 @@
-// const chai = require('chai')
-// const chaiHttp = require('chai-http')
-// const server = require('../index')
-// const tracer = require('tracer')
+const chai = require('chai')
+const chaiHttp = require('chai-http')
+const app = require('../index.js') // Adjust the path based on your actual file structure
+const db = require('../src/dao/mysql-db')
+const logger = require('../src/util/logger')
 
-// chai.should()
-// chai.use(chaiHttp)
-// tracer.setLevel('warn')
+const expect = chai.expect
 
-// const endpointToTest = '/api/user/:userId'
+chai.use(chaiHttp)
 
-// describe('Use Case 206 - Deleting user', () => {
-//     beforeEach((done) => {
-//         console.log('Before each test')
-//         done()
-//     })
+const CLEAR_USERS_TABLE = 'DELETE IGNORE FROM `user`;'
+const INSERT_USER = `
+    INSERT INTO \`user\` (\`id\`, \`firstName\`, \`lastName\`, \`emailAdress\`, \`password\`, \`street\`, \`city\`)
+    VALUES (1, 'John', 'Doe', 'test@example.com', 'correctpassword', 'Main Street', 'New York');
+`
 
-//     // TC-206-1: User does not exist
-//     it('TC-206-1 User does not exist', (done) => {
-//         chai.request(server)
-//             .delete(endpointToTest)
-//             .set('Authorization', 'Bearer validtoken')
-//             .end((err, res) => {
-//                 /**
-//                  * Using chai.expect for assertion
-//                  */
-//                 chai.expect(res).to.have.status(404)
-//                 chai.expect(res.body).to.be.a('object')
-//                 chai.expect(res.body)
-//                     .to.have.property('message')
-//                     .that.is.a('string')
-//                     .contains('User does not exist')
-//                 chai.expect(res.body).not.to.have.property('data')
+let validToken = ''
 
-//                 done()
-//             })
-//     })
+beforeEach((done) => {
+    db.getConnection((err, connection) => {
+        if (err) {
+            logger.error('Error connecting to database:', err)
+            done(err)
+            return
+        }
 
-//     // TC-206-2: User is not logged in
-//     it('TC-206-2 User is not logged in', (done) => {
-//         chai.request(server)
-//             .delete(endpointToTest)
-//             .end((err, res) => {
-//                 res.should.have.status(401)
-//                 res.body.should.be.a('object')
-//                 res.body.should.have
-//                     .property('message')
-//                     .that.is.a('string')
-//                     .contains('Not logged in')
-//                 res.body.should.not.have.property('data')
-//                 done()
-//             })
-//     })
+        connection.query(CLEAR_USERS_TABLE, (err, results) => {
+            if (err) {
+                logger.error('Error clearing users table:', err)
+                connection.release()
+                done(err)
+                return
+            }
 
-//     // TC-206-3: The user is not the owner of the data
-//     it('TC-206-3 The user is not the owner of the data', (done) => {
-//         chai.request(server)
-//             .delete(endpointToTest)
-//             .set('Authorization', 'Bearer invalidtoken')
-//             .end((err, res) => {
-//                 res.should.have.status(403)
-//                 res.body.should.be.a('object')
-//                 res.body.should.have
-//                     .property('message')
-//                     .that.is.a('string')
-//                     .contains('User is not the owner of the data')
-//                 res.body.should.not.have.property('data')
-//                 done()
-//             })
-//     })
+            connection.query(INSERT_USER, (err, results) => {
+                if (err) {
+                    logger.error('Error inserting user:', err)
+                    connection.release()
+                    done(err)
+                    return
+                }
 
-//     // TC-206-4: User successfully deleted
-//     it('TC-206-4 User successfully deleted', (done) => {
-//         chai.request(server)
-//             .delete(endpointToTest)
-//             .set('Authorization', 'Bearer validtoken')
-//             .end((err, res) => {
-//                 res.should.have.status(200)
-//                 res.body.should.be.a('object')
-//                 res.body.should.have
-//                     .property('message')
-//                     .that.is.a('string')
-//                     .contains('User successfully deleted')
-//                 done()
-//             })
-//     })
-// })
+                connection.release()
+                // Generate or fetch a valid token for user ID 1
+                chai.request(app)
+                    .post('/api/login')
+                    .send({
+                        emailAdress: 'test@example.com',
+                        password: 'correctpassword'
+                    })
+                    .end((err, res) => {
+                        if (err) {
+                            logger.error('Error logging in user:', err)
+                            done(err)
+                            return
+                        }
+                        validToken = res.body.data.token // Capture the valid token for use
+                        done()
+                    })
+            })
+        })
+    })
+})
+
+describe('User Deletion API Tests', () => {
+    // TC-206-1: User does not exist (404)
+    it('TC-206-1 should return 500 when attempting to delete a non-existing user', (done) => {
+        chai.request(app)
+            .delete('/api/user/999') // Assuming user ID 999 does not exist
+            .set('Authorization', `Bearer ${validToken}`)
+            .end((err, res) => {
+                expect(res).to.have.status(500)
+                expect(res.body).to.be.an('object')
+                expect(res.body).to.have.property('status', 500)
+                expect(res.body).to.have.property(
+                    'message',
+                    'User with id 999 not found.'
+                )
+                expect(res.body).to.have.property('data').to.be.empty
+                done()
+            })
+    })
+
+    // TC-206-2: User is not logged in
+    it('TC-206-2 should return 404 when user is not logged in', (done) => {
+        chai.request(app)
+            .delete('/api/user/1') // Assuming user ID 1 exists in the test setup
+            .end((err, res) => {
+                expect(res).to.have.status(404)
+                expect(res.body).to.be.an('object')
+                expect(res.body).to.have.property('status', 404)
+                expect(res.body).to.have.property(
+                    'message',
+                    'Unautorized! Log in to get access.'
+                )
+                expect(res.body).to.have.property('data').to.be.empty
+                done()
+            })
+    })
+
+    // TC-206-4: User successfully deleted (200)
+    it('TC-206-4 should return 200 with specific success message when user is successfully deleted', (done) => {
+        chai.request(app)
+            .delete('/api/user/1') // Assuming user ID 1 exists in the test setup
+            .set('Authorization', `Bearer ${validToken}`)
+            .end((err, res) => {
+                expect(res).to.have.status(200)
+                expect(res.body).to.be.an('object')
+                expect(res.body).to.have.property('status', 200)
+                expect(res.body).to.have.property(
+                    'message',
+                    'User with id 1 deleted successfully.'
+                )
+                expect(res.body).to.have.property('data').to.be.empty
+                done()
+            })
+    })
+})

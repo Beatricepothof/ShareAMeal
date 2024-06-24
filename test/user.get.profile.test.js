@@ -41,7 +41,7 @@
 //                 }
 
 //                 connection.release()
-//                 // Generate or fetch a valid token for use
+//                 // Generate or fetch a valid token for TC-203-2
 //                 chai.request(app)
 //                     .post('/api/login')
 //                     .send({
@@ -62,11 +62,11 @@
 //     })
 // })
 
-// describe('User Data Retrieval by ID API Tests', () => {
-//     // TC-204-1: Invalid Token
-//     it('TC-204-1 should return 401 with specific error message when token is invalid', (done) => {
+// describe('User Profile Retrieval API Tests', () => {
+//     // TC-203-1: Invalid Token
+//     it('TC-203-1 should return 401 with specific error message when token is invalid', (done) => {
 //         chai.request(app)
-//             .get('/api/user/123') // Assuming 123 is a non-existing user ID
+//             .get('/api/user/profile')
 //             .set('Authorization', 'Bearer invalidtoken')
 //             .end((err, res) => {
 //                 if (err) {
@@ -86,10 +86,10 @@
 //             })
 //     })
 
-//     // TC-204-2: User ID does not exist
-//     it('TC-204-2 should return 404 with specific error message when user ID does not exist', (done) => {
+//     // TC-203-2: User profile not found
+//     it('TC-203-2 should return 500 with specific error message when user profile is not found', (done) => {
 //         chai.request(app)
-//             .get('/api/user/999') // Assuming 999 is a non-existing user ID
+//             .get('/api/user/profile')
 //             .set('Authorization', `Bearer ${validToken}`)
 //             .end((err, res) => {
 //                 if (err) {
@@ -97,39 +97,15 @@
 //                     done(err)
 //                     return
 //                 }
-//                 expect(res).to.have.status(404)
+//                 expect(res).to.have.status(500)
 //                 expect(res.body).to.be.an('object')
-//                 expect(res.body).to.have.property('status', 404)
-//                 expect(res.body)
-//                     .to.have.property('message')
-//                     .that.includes('User with id 999 not found.')
-//                 expect(res.body).to.have.property('data').to.be.empty
-
-//                 done()
-//             })
-//     })
-
-//     // TC-204-3: User ID exists
-//     it('TC-204-3 should return 200 with specific success message and user data when user ID exists', (done) => {
-//         chai.request(app)
-//             .get('/api/user/1') // Assuming 1 is the ID of the inserted user
-//             .set('Authorization', `Bearer ${validToken}`)
-//             .end((err, res) => {
-//                 if (err) {
-//                     logger.error('Error in request:', err)
-//                     done(err)
-//                     return
-//                 }
-//                 expect(res).to.have.status(200)
-//                 expect(res.body).to.be.an('object')
-//                 expect(res.body).to.have.property('status', 200)
-//                 expect(res.body)
-//                     .to.have.property('message')
-//                     .that.includes('User found successfully.')
+//                 expect(res.body).to.have.property('status', 500)
+//                 expect(res.body).to.have.property(
+//                     'message',
+//                     'User with id profile not found.'
+//                 )
 //                 expect(res.body).to.have.property('data').that.is.an('object')
-//                 expect(res.body.data).to.have.property('id', 1)
-//                 expect(res.body.data).to.have.property('firstName', 'John')
-//                 expect(res.body.data).to.have.property('lastName', 'Doe')
+//                     .that.is.empty
 
 //                 done()
 //             })

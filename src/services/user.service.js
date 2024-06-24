@@ -84,9 +84,11 @@ const userService = {
                     } else {
                         logger.debug(results)
                         if (results.length === 0) {
-                            const notFoundError = new Error(
-                                `User with id ${userId} not found.`
-                            )
+                            const notFoundError = {
+                                status: 404,
+                                message: `User with id ${userId} not found.`,
+                                data: {}
+                            }
                             logger.info(
                                 'user not found:',
                                 notFoundError.message
@@ -94,6 +96,7 @@ const userService = {
                             callback(notFoundError, null)
                         } else {
                             callback(null, {
+                                status: 200,
                                 message: 'User found successfully.',
                                 data: results[0]
                             })

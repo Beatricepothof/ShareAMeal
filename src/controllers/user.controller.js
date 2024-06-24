@@ -69,12 +69,18 @@ let userController = {
         userService.getById(userId, (error, success) => {
             if (error) {
                 return next({
-                    status: error.status,
-                    message: error.message,
-                    data: {}
+                    status: error.status || 500,
+                    message: error.message || 'Internal Server Error',
+                    data: error.data || {}
                 })
             }
-            if (success) {
+            if (!success.data) {
+                return res.status(404).json({
+                    status: 404,
+                    message: `User with id ${userId} not found.`,
+                    data: {}
+                })
+            } else {
                 res.status(200).json({
                     status: success.status,
                     message: success.message,

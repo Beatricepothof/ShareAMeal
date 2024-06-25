@@ -96,7 +96,7 @@ function validateToken(req, res, next) {
     if (!authHeader) {
         logger.warn('Authorization header missing!')
         next({
-            status: 404,
+            status: 401,
             message: 'Unautorized! Log in to get access.',
             data: {}
         })
@@ -108,7 +108,7 @@ function validateToken(req, res, next) {
             if (err) {
                 logger.warn('Token verification failed:', err.message)
                 return next({
-                    status: 401,
+                    status: 403,
                     message: 'Unauthorized! Invalid token.',
                     data: {}
                 })

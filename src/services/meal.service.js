@@ -4,6 +4,12 @@ const db = require('../dao/mysql-db')
 const mealService = {
     create: (meal, callback) => {
         logger.info('Creating meal', meal)
+        if (!meal.name || !meal.price || !meal.maxAmountOfParticipants) {
+            const error = new Error('Required field(s) missing')
+            error.code = 'required_fields_missing'
+            callback(error, null)
+            return
+        }
         db.getConnection((err, connection) => {
             if (err) {
                 logger.error(err)
@@ -25,7 +31,7 @@ const mealService = {
                             `Meal created with id ${results.insertId}.`
                         )
                         callback(null, {
-                            message: `Meal created with id ${results.insertId}.`,
+                            message: `Meal successfully added`,
                             data: meal
                         })
                     }
@@ -36,6 +42,14 @@ const mealService = {
 
     update: (mealId, meal, callback) => {
         logger.info(`Updating meal with id ${mealId}`, meal)
+        if (!meal.name && !meal.price && !meal.maxAmountOfParticipants) {
+            const error = new Error(
+                'Required fields "name" and/or "price" and/or "maxAmountOfParticipants" missing'
+            )
+            error.code = 'required_fields_missing'
+            callback(error, null)
+            return
+        }
         db.getConnection((err, connection) => {
             if (err) {
                 logger.error(err)
@@ -52,12 +66,16 @@ const mealService = {
                     if (error) {
                         logger.error(error)
                         callback(error, null)
+                    } else if (results.affectedRows === 0) {
+                        const notFoundError = new Error(`Meal not found`)
+                        notFoundError.code = 'meal_not_found'
+                        callback(notFoundError, null)
                     } else {
                         logger.trace(
                             `Meal with id ${mealId} updated successfully.`
                         )
                         callback(null, {
-                            message: `Meal with id ${mealId} updated successfully.`,
+                            message: `Meal successfully updated`,
                             data: meal
                         })
                     }
@@ -86,7 +104,7 @@ const mealService = {
                     } else {
                         logger.debug(results)
                         callback(null, {
-                            message: `Found ${results.length} meals.`,
+                            message: `List of meals returned`,
                             data: results
                         })
                     }
@@ -113,28 +131,16 @@ const mealService = {
                     if (error) {
                         logger.error(error)
                         callback(error, null)
+                    } else if (results.length === 0) {
+                        const notFoundError = new Error(`Meal not found`)
+                        notFoundError.code = 'meal_not_found'
+                        callback(notFoundError, null)
                     } else {
                         logger.debug('Fetched meal:', results[0])
-                        if (results.length === 0) {
-                            const notFoundError = new Error(
-                                `Meal with id ${mealId} not found.`
-                            )
-                            logger.info(
-                                'Meal not found:',
-                                notFoundError.message
-                            )
-                            callback(notFoundError, {
-                                status: 404,
-                                message: `Meal with id ${mealId} not found`,
-                                data: null
-                            })
-                        } else {
-                            callback(null, {
-                                status: 200,
-                                message: `Found meal with id ${mealId}`,
-                                data: results[0]
-                            })
-                        }
+                        callback(null, {
+                            message: `Meal details returned`,
+                            data: results[0]
+                        })
                     }
                 }
             )
@@ -159,10 +165,14 @@ const mealService = {
                     if (error) {
                         logger.error(error)
                         callback(error, null)
+                    } else if (results.affectedRows === 0) {
+                        const notFoundError = new Error(`Meal not found`)
+                        notFoundError.code = 'meal_not_found'
+                        callback(notFoundError, null)
                     } else {
-                        logger.info(`Meal with id ${mealId} is deleted.`)
+                        logger.info(`Meal successfully deleted`)
                         callback(null, {
-                            message: `Meal with id ${mealId} is deleted.`
+                            message: `Meal successfully deleted`
                         })
                     }
                 }

@@ -4,6 +4,18 @@ const db = require('../dao/mysql-db')
 const userService = {
     create: (user, callback) => {
         logger.info('create user', user)
+        if (
+            !user.firstName ||
+            !user.lastName ||
+            !user.emailAdress ||
+            !user.password
+        ) {
+            const error = new Error('Required fields are missing.')
+            error.code = 'missing_field'
+            callback(error, null)
+            return
+        }
+
         db.getConnection(function (err, connection) {
             if (err) {
                 logger.error(err)
@@ -44,7 +56,7 @@ const userService = {
             }
 
             connection.query(
-                'SELECT id, firstName, lastName, isActive, emailAdress, password, phoneNumber, roles, street, city FROM user',
+                'SELECT id, firstName, lastName, isActive, emailAdress, phoneNumber, roles, street, city FROM user',
                 (error, results, fields) => {
                     connection.release()
 
@@ -73,7 +85,7 @@ const userService = {
             }
 
             connection.query(
-                'SELECT id, firstName, lastName, isActive, emailadress, password, phoneNumber, roles, street, city FROM user WHERE id = ?',
+                'SELECT id, firstName, lastName, isActive, emailAdress, phoneNumber, roles, street, city FROM user WHERE id = ?',
                 [userId],
                 (error, results, fields) => {
                     connection.release()
@@ -84,15 +96,14 @@ const userService = {
                     } else {
                         logger.debug(results)
                         if (results.length === 0) {
-                            callback(
-                                {
-                                    message: `User with id ${userId} not found.`,
-                                    data: {}
-                                },
-                                null
+                            const notFoundError = new Error(
+                                `User with id ${userId} not found.`
                             )
+                            notFoundError.code = 'not_found'
+                            callback(notFoundError, null)
                         } else {
                             callback(null, {
+                                status: 200,
                                 message: 'User found successfully.',
                                 data: results[0]
                             })
@@ -123,19 +134,18 @@ const userService = {
                         callback(error, null)
                     } else {
                         if (results.affectedRows === 0) {
-                            callback(
-                                {
-                                    message: `User with id ${userId} not found.`,
-                                    data: {}
-                                },
-                                null
+                            const notFoundError = new Error(
+                                `User with id ${userId} not found.`
                             )
+                            notFoundError.code = 'not_found'
+                            callback(notFoundError, null)
                         } else {
                             logger.trace(
                                 `User updated with id ${userId}:`,
                                 newData
                             )
                             callback(null, {
+                                status: 200,
                                 message: `User with id ${userId} updated successfully.`,
                                 data: newData
                             })
@@ -166,18 +176,17 @@ const userService = {
                         callback(error, null)
                     } else {
                         if (results.affectedRows === 0) {
-                            callback(
-                                {
-                                    message: `User with id ${userId} not found.`,
-                                    data: {}
-                                },
-                                null
+                            const notFoundError = new Error(
+                                `User with id ${userId} not found.`
                             )
+                            notFoundError.code = 'not_found'
+                            callback(notFoundError, null)
                         } else {
                             logger.trace(
                                 `User with id ${userId} deleted successfully.`
                             )
                             callback(null, {
+                                status: 200,
                                 message: `User with id ${userId} deleted successfully.`,
                                 data: {}
                             })
@@ -189,36 +198,68 @@ const userService = {
     },
 
     getProfile: (userId, callback) => {
-        const query = 'SELECT * FROM users WHERE id = ?'
+        logger.info('Fetching profile for user:', userId)
 
-        db.getConnection((err, connection) => {
+        db.getConnection(function (err, connection) {
             if (err) {
-                return callback(err, null)
+                logger.error(err)
+                callback(err, null)
+                return
             }
 
-            connection.query(query, [userId], (error, results) => {
-                connection.release()
+            connection.query(
+                `SELECT u.id, u.firstName, u.lastName, u.emailAdress, 
+                        m.id AS mealId, m.cookId, m.name, m.description
+                FROM user u
+                LEFT JOIN meal m ON u.id = m.cookId
+                WHERE u.id = ?`,
+                [userId],
+                (error, results, fields) => {
+                    connection.release()
 
-                if (error) {
-                    return callback(error, null)
+                    if (error) {
+                        logger.error(error)
+                        callback(
+                            {
+                                status: 500,
+                                message:
+                                    error.message || 'Internal Server Error'
+                            },
+                            null
+                        )
+                    } else {
+                        if (results.length === 0) {
+                            const notFoundError = {
+                                status: 404,
+                                message: `User with id ${userId} not found.`
+                            }
+                            callback(notFoundError, null)
+                        } else {
+                            const user = results[0]
+
+                            // Collect meals cooked by the user
+                            const meals = results
+                                .filter((result) => result.mealId !== null)
+                                .map((result) => ({
+                                    id: result.mealId,
+                                    cookId: result.cookId,
+                                    name: result.name,
+                                    description: result.description
+                                }))
+
+                            // Return user profile with meals
+                            const userProfile = {
+                                id: user.id,
+                                firstName: user.firstName,
+                                lastName: user.lastName,
+                                emailAdress: user.emailAdress,
+                                meals: meals
+                            }
+                            callback(null, userProfile)
+                        }
+                    }
                 }
-
-                if (results.length === 0) {
-                    return callback(
-                        {
-                            message: `User with id ${userId} not found.`,
-                            data: {}
-                        },
-                        null
-                    )
-                }
-
-                const user = results[0]
-                callback(null, {
-                    message: 'User profile retrieved successfully.',
-                    data: user
-                })
-            })
+            )
         })
     },
 
@@ -247,10 +288,20 @@ const userService = {
                     callback(error, null)
                 } else {
                     logger.debug('Filtered users:', results)
-                    callback(null, {
-                        message: `Found ${results.length} users.`,
-                        data: results
-                    })
+
+                    if (results.length === 0) {
+                        callback(null, {
+                            status: 200,
+                            message: 'No filtered users found.',
+                            data: []
+                        })
+                    } else {
+                        callback(null, {
+                            status: 200,
+                            message: `Found ${results.length} users.`,
+                            data: results
+                        })
+                    }
                 }
             })
         })

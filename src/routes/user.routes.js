@@ -150,6 +150,7 @@ router.post(
 )
 // Handles both getAll and getByFilters
 router.get('/api/user', validateToken, userController.getAll)
+router.get('/api/user/profile', validateToken, userController.getProfile)
 router.get('/api/user/:userId', validateToken, userController.getById)
 router.put(
     '/api/user/:userId',
@@ -158,13 +159,6 @@ router.put(
     userController.update
 )
 router.delete('/api/user/:userId', validateToken, userController.delete)
-router.get(
-    '/api/user/profile',
-    validateToken,
-    validateToken,
-    userController.getProfile
-)
-router.get('/api/user/profile', validateToken, userController.getProfile)
 
 // Tijdelijke routes om niet bestaande routes op te vangen
 // router.put('/api/user/:userId', notFound)

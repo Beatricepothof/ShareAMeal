@@ -52,7 +52,12 @@ router.post(
     validateMealCreate,
     mealController.create
 )
-router.put('/api/meal/:mealId', validateMealUpdate, mealController.update)
+router.put(
+    '/api/meal/:mealId',
+    validateToken,
+    validateMealUpdate,
+    mealController.update
+)
 router.get('/api/meal', validateToken, mealController.getAll)
 router.get('/api/meal/:mealId', validateToken, mealController.getById)
 router.delete('/api/meal/:mealId', validateToken, mealController.delete)

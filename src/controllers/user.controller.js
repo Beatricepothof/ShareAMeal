@@ -5,21 +5,19 @@ let userController = {
     create: (req, res, next) => {
         const user = req.body
         logger.info('create user', user.firstName, user.lastName)
-        userService.create(user, (error, success) => {
+        userService.create(user, (error, result) => {
             if (error) {
                 return next({
-                    status: error.status,
-                    message: error.message,
+                    status: 500,
+                    message: 'Internal Server Error',
                     data: {}
                 })
             }
-            if (success) {
-                res.status(200).json({
-                    status: success.status,
-                    message: success.message,
-                    data: success.data
-                })
-            }
+            res.status(201).json({
+                status: 201,
+                message: result.message,
+                data: result.data
+            })
         })
     },
 
@@ -31,8 +29,8 @@ let userController = {
             userService.getByFilters(filters, (error, result) => {
                 if (error) {
                     return next({
-                        status: error.status || 500,
-                        message: error.message || 'Internal Server Error',
+                        status: 500,
+                        message: 'Internal Server Error',
                         data: {}
                     })
                 }
@@ -40,7 +38,7 @@ let userController = {
                 res.status(200).json({
                     status: 200,
                     message: 'Filtered users retrieved successfully',
-                    data: result
+                    data: result.data
                 })
             })
         } else {
@@ -48,8 +46,8 @@ let userController = {
             userService.getAll((error, result) => {
                 if (error) {
                     return next({
-                        status: error.status || 500,
-                        message: error.message || 'Internal Server Error',
+                        status: 500,
+                        message: 'Internal Server Error',
                         data: {}
                     })
                 }
@@ -57,7 +55,7 @@ let userController = {
                 res.status(200).json({
                     status: 200,
                     message: 'All users retrieved successfully',
-                    data: result
+                    data: result.data
                 })
             })
         }
@@ -66,27 +64,26 @@ let userController = {
     getById: (req, res, next) => {
         const userId = req.params.userId
         logger.trace('userController: getById', userId)
-        userService.getById(userId, (error, success) => {
+        userService.getById(userId, (error, result) => {
             if (error) {
                 return next({
-                    status: error.status || 500,
-                    message: error.message || 'Internal Server Error',
-                    data: error.data || {}
+                    status: 500,
+                    message: 'Internal Server Error',
+                    data: {}
                 })
             }
-            if (!success.data) {
+            if (!result.data) {
                 return res.status(404).json({
                     status: 404,
                     message: `User with id ${userId} not found.`,
                     data: {}
                 })
-            } else {
-                res.status(200).json({
-                    status: success.status,
-                    message: success.message,
-                    data: success.data
-                })
             }
+            res.status(200).json({
+                status: 200,
+                message: result.message,
+                data: result.data
+            })
         })
     },
 
@@ -94,44 +91,54 @@ let userController = {
         const userId = req.params.userId
         const newData = req.body
         logger.info(`Updating user with id ${userId}`, newData)
-        userService.update(userId, newData, (error, success) => {
+        userService.update(userId, newData, (error, result) => {
             if (error) {
                 return next({
-                    status: error.status,
-                    message: error.message,
+                    status: 500,
+                    message: 'Internal Server Error',
                     data: {}
                 })
             }
-            if (success) {
-                res.status(200).json({
-                    status: success.status,
-                    message: success.message,
-                    data: success.data
+            if (!result.data) {
+                return res.status(404).json({
+                    status: 404,
+                    message: `User with id ${userId} not found.`,
+                    data: {}
                 })
             }
+            res.status(200).json({
+                status: 200,
+                message: result.message,
+                data: result.data
+            })
         })
     },
 
     delete: (req, res, next) => {
         const userId = req.params.userId
         logger.info(`Attempting to delete user with id ${userId}`)
-        userService.delete(userId, (error, success) => {
+        userService.delete(userId, (error, result) => {
             if (error) {
                 logger.error('Error deleting user:', error)
                 return next({
-                    status: error.status,
-                    message: error.message,
+                    status: 500,
+                    message: 'Internal Server Error',
                     data: {}
                 })
             }
-            if (success) {
-                logger.info('User deleted successfully')
-                res.status(200).json({
-                    status: success.status,
-                    message: success.message,
-                    data: success.data
+            if (!result.data) {
+                return res.status(404).json({
+                    status: 404,
+                    message: `User with id ${userId} not found.`,
+                    data: {}
                 })
             }
+            logger.info('User deleted successfully')
+            res.status(200).json({
+                status: 200,
+                message: result.message,
+                data: result.data
+            })
         })
     },
 
@@ -141,9 +148,16 @@ let userController = {
         userService.getProfile(userId, (err, profile) => {
             if (err) {
                 return next({
-                    status: err.status || 500,
-                    message: err.message || 'Internal Server Error',
-                    data: err.data || {}
+                    status: 500,
+                    message: 'Internal Server Error',
+                    data: {}
+                })
+            }
+            if (!profile) {
+                return res.status(404).json({
+                    status: 404,
+                    message: `Profile for user with id ${userId} not found.`,
+                    data: {}
                 })
             }
 

@@ -84,19 +84,15 @@ const userService = {
                     } else {
                         logger.debug(results)
                         if (results.length === 0) {
-                            const notFoundError = {
-                                status: 404,
-                                message: `User with id ${userId} not found.`,
-                                data: {}
-                            }
-                            logger.info(
-                                'user not found:',
-                                notFoundError.message
+                            callback(
+                                {
+                                    message: `User with id ${userId} not found.`,
+                                    data: {}
+                                },
+                                null
                             )
-                            callback(notFoundError, null)
                         } else {
                             callback(null, {
-                                status: 200,
                                 message: 'User found successfully.',
                                 data: results[0]
                             })
@@ -127,21 +123,19 @@ const userService = {
                         callback(error, null)
                     } else {
                         if (results.affectedRows === 0) {
-                            const notFoundError = new Error(
-                                `User with id ${userId} not found.`
+                            callback(
+                                {
+                                    message: `User with id ${userId} not found.`,
+                                    data: {}
+                                },
+                                null
                             )
-                            logger.info(
-                                'user not found:',
-                                notFoundError.message
-                            )
-                            callback(notFoundError, null)
                         } else {
                             logger.trace(
                                 `User updated with id ${userId}:`,
                                 newData
                             )
                             callback(null, {
-                                status: 200,
                                 message: `User with id ${userId} updated successfully.`,
                                 data: newData
                             })
@@ -172,20 +166,18 @@ const userService = {
                         callback(error, null)
                     } else {
                         if (results.affectedRows === 0) {
-                            const notFoundError = new Error(
-                                `User with id ${userId} not found.`
+                            callback(
+                                {
+                                    message: `User with id ${userId} not found.`,
+                                    data: {}
+                                },
+                                null
                             )
-                            logger.info(
-                                'user not found:',
-                                notFoundError.message
-                            )
-                            callback(notFoundError, null)
                         } else {
                             logger.trace(
                                 `User with id ${userId} deleted successfully.`
                             )
                             callback(null, {
-                                status: 200,
                                 message: `User with id ${userId} deleted successfully.`,
                                 data: {}
                             })
@@ -199,36 +191,33 @@ const userService = {
     getProfile: (userId, callback) => {
         const query = 'SELECT * FROM users WHERE id = ?'
 
-        mysqlPool.getConnection((err, connection) => {
+        db.getConnection((err, connection) => {
             if (err) {
-                return callback({
-                    status: 500,
-                    message: 'Error connecting to database.',
-                    error: err
-                })
+                return callback(err, null)
             }
 
             connection.query(query, [userId], (error, results) => {
-                connection.release() // Release the connection
+                connection.release()
 
                 if (error) {
-                    return callback({
-                        status: 500,
-                        message: 'Error executing query.',
-                        error: error
-                    })
+                    return callback(error, null)
                 }
 
                 if (results.length === 0) {
-                    return callback({
-                        status: 404,
-                        message: `User with id ${userId} not found.`
-                    })
+                    return callback(
+                        {
+                            message: `User with id ${userId} not found.`,
+                            data: {}
+                        },
+                        null
+                    )
                 }
 
-                // Assuming you want to return only one user (first one found)
                 const user = results[0]
-                callback(null, user)
+                callback(null, {
+                    message: 'User profile retrieved successfully.',
+                    data: user
+                })
             })
         })
     },

@@ -1,6 +1,3 @@
-//
-// Authentication controller
-//
 const jwt = require('jsonwebtoken')
 const db = require('../dao/mysql-db')
 // const validateEmail = require('../util/emailvalidator')

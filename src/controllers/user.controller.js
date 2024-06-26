@@ -215,7 +215,6 @@ let userController = {
     getProfile: (req, res, next) => {
         logger.info('Fetching profile details')
 
-        // Use the userId from req object (set during token validation)
         const userId = req.userId
 
         userService.getProfile(userId, (error, profile) => {

@@ -3,7 +3,7 @@ const db = require('../dao/mysql-db')
 const logger = require('../util/logger')
 const config = require('../util/config')
 
-const jwtSecretKey = config.secretkey // Use the secret key from the configuration
+const jwtSecretKey = config.secretkey
 
 const authController = {
     login: (req, res, next) => {
@@ -119,7 +119,7 @@ const authController = {
                         return
                     }
 
-                    // If registration was successful, then return the generated user ID along with the registration data
+                    // If registration was successful, then return the generated user id along with the registration data
                     const userId = results.insertId
                     callback(null, {
                         status: 201,

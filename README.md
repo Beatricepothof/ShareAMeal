@@ -23,11 +23,9 @@ Configure the .env file in the root directory of this project,
 Add your environment variables to the .env. For example:
 
 ```
-
 DB_HOST=localhost
 DB_USER=root
 DB_PASSWORD=your_password
-
 ```
 
 This is crucial for your project to be able to run.

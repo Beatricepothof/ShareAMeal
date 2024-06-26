@@ -148,7 +148,7 @@ router.post(
     validateUserCreate,
     userController.create
 )
-// Handles both getAll and getByFilters
+// Handles both getAll and getByFilters and getbyIsActive
 router.get('/api/user', validateToken, userController.getAll)
 router.get('/api/user/profile', validateToken, userController.getProfile)
 router.get('/api/user/:userId', validateToken, userController.getById)

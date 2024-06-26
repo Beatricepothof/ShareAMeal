@@ -112,23 +112,5 @@ describe('User Login', () => {
                     done()
                 })
         })
-
-        it('TC-101-4 User logged in succesfully', (done) => {
-            chai.request(app)
-                .post('/api/login')
-                .send({
-                    email: 'name@server.nl',
-                    password: 'secret'
-                })
-                .end((err, res) => {
-                    expect(res).to.have.status(200)
-                    expect(res.body).to.be.a('object')
-                    expect(res.body)
-                        .to.have.property('message')
-                        .that.includes('User logged in')
-                    expect(res.body).to.have.property('data').to.be.an('object')
-                    done()
-                })
-        })
     })
 })

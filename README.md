@@ -23,11 +23,9 @@ Configure the .env file in the root directory of this project,
 Add your environment variables to the .env. For example:
 
 ```
-
 DB_HOST=localhost
 DB_USER=root
 DB_PASSWORD=your_password
-
 ```
 
 This is crucial for your project to be able to run.
@@ -41,3 +39,4 @@ To run the server locally on your computer, type `npm run dev`.
 To run the tests, type `npm test` into the console.
 
 This command will run all tests in the project.
+

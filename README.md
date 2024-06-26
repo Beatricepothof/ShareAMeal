@@ -8,7 +8,7 @@ Welcome to the Node.js Programmeren 4 Express server project. This project was m
 
 You can do this through the GitHub website.
 
-1. Navigate to the repository: (https://github.com/Beatricepothof/ShareAMeal)
+1. Navigate to the repository: https://github.com/Beatricepothof/ShareAMeal
 2. Click on fork > Create new fork.
 3. Create a new repository or use an existing one.
 4. follow the instructions to complete.

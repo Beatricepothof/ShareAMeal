@@ -43,7 +43,32 @@ let userController = {
     getAll: (req, res, next) => {
         const filters = req.query
 
-        if (Object.keys(filters).length > 0) {
+        if (filters.isActive !== undefined) {
+            const isActive = filters.isActive === 'true' // Convert string to boolean
+            userService.getByIsActive(isActive, (error, result) => {
+                if (error) {
+                    return next({
+                        status: 500,
+                        message: error.message || 'Internal Server Error',
+                        data: {}
+                    })
+                }
+
+                if (result.data.length === 0) {
+                    res.status(200).json({
+                        status: 200,
+                        message: `No users found where isActive=${isActive}.`,
+                        data: []
+                    })
+                } else {
+                    res.status(200).json({
+                        status: 200,
+                        message: `Found ${result.data.length} users where isActive=${isActive}.`,
+                        data: result.data
+                    })
+                }
+            })
+        } else if (Object.keys(filters).length > 0) {
             logger.info('Fetching users with filters:', filters)
             userService.getByFilters(filters, (error, result) => {
                 if (error) {
@@ -92,7 +117,7 @@ let userController = {
         logger.trace('userController: getById', userId)
         userService.getById(userId, (error, success) => {
             if (error) {
-                if (error.code === 'user_not_found') {
+                if (error.code === 'not_found') {
                     return res.status(404).json({
                         status: 404,
                         message: `User with id ${userId} not found.`,

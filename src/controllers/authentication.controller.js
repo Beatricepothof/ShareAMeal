@@ -70,8 +70,8 @@ const authController = {
                                 logger.debug(
                                     'User not found or password invalid'
                                 )
-                                res.status(404).json({
-                                    status: 404,
+                                res.status(400).json({
+                                    status: 400,
                                     message:
                                         'User not found or password invalid',
                                     data: {}

@@ -305,6 +305,45 @@ const userService = {
                 }
             })
         })
+    },
+
+    getByIsActive: (isActive, callback) => {
+        logger.info(`Fetching users where isActive=${isActive}`)
+        db.getConnection((err, connection) => {
+            if (err) {
+                logger.error(err)
+                callback(err, null)
+                return
+            }
+
+            const query = 'SELECT * FROM `user` WHERE isActive = ?'
+            const queryParams = [isActive]
+
+            connection.query(query, queryParams, (error, results) => {
+                connection.release()
+
+                if (error) {
+                    logger.error(error)
+                    callback(error, null)
+                } else {
+                    logger.debug('Filtered users:', results)
+
+                    if (results.length === 0) {
+                        callback(null, {
+                            status: 200,
+                            message: `No users found where isActive=${isActive}.`,
+                            data: []
+                        })
+                    } else {
+                        callback(null, {
+                            status: 200,
+                            message: `Found ${results.length} users where isActive=${isActive}.`,
+                            data: results
+                        })
+                    }
+                }
+            })
+        })
     }
 }
 

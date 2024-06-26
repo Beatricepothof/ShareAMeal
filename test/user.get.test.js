@@ -93,7 +93,7 @@
 //     // TC-202-2: Search for users with a non-existing field
 //     it('TC-202-2 should return 400 when searching with a non-existing field', (done) => {
 //         chai.request(app)
-//             .get('/api/user?firstName=Mariëtte&lastName=Pothof')
+//             .get('/api/user?firstName=Bla&lastName=Blabla')
 //             .set('Authorization', `Bearer ${token}`)
 //             .end((err, res) => {
 //                 if (err) {
@@ -106,7 +106,7 @@
 //                 expect(res.body).to.have.property('status', 200)
 //                 expect(res.body)
 //                     .to.have.property('message')
-//                     .that.includes('Filtered users retrieved successfully')
+//                     .that.includes('No filtered users found.')
 //                 expect(res.body).to.have.property('data')
 //                 done()
 //             })
@@ -128,7 +128,6 @@
 //                 expect(res.body).to.have.property('status', 200)
 //                 expect(res.body)
 //                     .to.have.property('message')
-//                     .that.includes('Filtered users retrieved successfully')
 //                     .and.includes('users')
 //                 expect(res.body).to.have.property('data')
 //                 done()
@@ -151,7 +150,6 @@
 //                 expect(res.body).to.have.property('status', 200)
 //                 expect(res.body)
 //                     .to.have.property('message')
-//                     .that.includes('Filtered users retrieved successfully')
 //                     .and.includes('users')
 //                 expect(res.body).to.have.property('data')
 //                 done()
@@ -172,9 +170,7 @@
 //                 expect(res).to.have.status(200)
 //                 expect(res.body).to.be.an('object')
 //                 expect(res.body).to.have.property('status', 200)
-//                 expect(res.body)
-//                     .to.have.property('message')
-//                     .that.includes('Filtered users retrieved successfully')
+//                 expect(res.body).to.have.property('message')
 //                 expect(res.body).to.have.property('data')
 //                 done()
 //             })

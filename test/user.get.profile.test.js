@@ -86,8 +86,8 @@
 //             })
 //     })
 
-//     // TC-203-2: User profile not found
-//     it('TC-203-2 should return 500 with specific error message when user profile is not found', (done) => {
+//     // TC-203-2: User profile found
+//     it('TC-203-2 should return 200 with specific success message and user data when user profile is found', (done) => {
 //         chai.request(app)
 //             .get('/api/user/profile')
 //             .set('Authorization', `Bearer ${validToken}`)
@@ -97,15 +97,21 @@
 //                     done(err)
 //                     return
 //                 }
-//                 expect(res).to.have.status(500)
+//                 expect(res).to.have.status(200)
 //                 expect(res.body).to.be.an('object')
-//                 expect(res.body).to.have.property('status', 500)
+//                 expect(res.body).to.have.property('status', 200)
 //                 expect(res.body).to.have.property(
 //                     'message',
-//                     'User with id profile not found.'
+//                     'User profile retrieved successfully.'
 //                 )
-//                 expect(res.body).to.have.property('data').that.is.an('object')
-//                     .that.is.empty
+//                 expect(res.body).to.have.property('data')
+//                 expect(res.body.data).to.be.an('object')
+//                 expect(res.body.data).to.have.property('profile')
+//                 expect(res.body.data.profile).to.be.an('object')
+//                 expect(res.body.data.profile).to.have.property('id')
+//                 expect(res.body.data.profile).to.have.property('firstName')
+//                 expect(res.body.data.profile).to.have.property('lastName')
+//                 expect(res.body.data.profile).to.have.property('emailAdress')
 
 //                 done()
 //             })

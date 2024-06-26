@@ -66,7 +66,7 @@
 //     // TC-204-1: Invalid Token
 //     it('TC-204-1 should return 401 with specific error message when token is invalid', (done) => {
 //         chai.request(app)
-//             .get('/api/user/123') // Assuming 123 is a non-existing user ID
+//             .get('/api/user/1') // Assuming 1 is an existing user ID
 //             .set('Authorization', 'Bearer invalidtoken')
 //             .end((err, res) => {
 //                 if (err) {
@@ -130,6 +130,15 @@
 //                 expect(res.body.data).to.have.property('id', 1)
 //                 expect(res.body.data).to.have.property('firstName', 'John')
 //                 expect(res.body.data).to.have.property('lastName', 'Doe')
+//                 expect(res.body.data).to.have.property('isActive', 1)
+//                 expect(res.body.data).to.have.property(
+//                     'emailAdress',
+//                     'test@example.com'
+//                 )
+//                 expect(res.body.data).to.have.property('phoneNumber', '-')
+//                 expect(res.body.data).to.have.property('roles', 'editor,guest')
+//                 expect(res.body.data).to.have.property('street', 'Main Street')
+//                 expect(res.body.data).to.have.property('city', 'New York')
 
 //                 done()
 //             })
